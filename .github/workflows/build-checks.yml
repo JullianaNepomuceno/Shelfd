@@ -1,0 +1,85 @@
+name: Build Checks (Java & Spring Boot)
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+jobs:
+  java-build-check:
+    name: Java build check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Run Java build (Maven/Gradle)
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ -f "pom.xml" || -f "mvnw" ]]; then
+            echo "Detected Maven project"
+            if [[ -f "mvnw" ]]; then
+              chmod +x mvnw
+              ./mvnw -B -ntp clean verify
+            else
+              mvn -B -ntp clean verify
+            fi
+          elif [[ -f "build.gradle" || -f "build.gradle.kts" || -f "gradlew" ]]; then
+            echo "Detected Gradle project"
+            if [[ -f "gradlew" ]]; then
+              chmod +x gradlew
+              ./gradlew --no-daemon clean build
+            else
+              gradle --no-daemon clean build
+            fi
+          else
+            echo "No Java build files found. Skipping Java build check."
+          fi
+
+  spring-boot-build-check:
+    name: Spring Boot build check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Run Spring Boot build
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ -f "pom.xml" ]] && grep -qi "spring-boot" pom.xml; then
+            echo "Detected Spring Boot Maven project"
+            if [[ -f "mvnw" ]]; then
+              chmod +x mvnw
+              ./mvnw -B -ntp clean verify
+            else
+              mvn -B -ntp clean verify
+            fi
+          elif ls build.gradle* >/dev/null 2>&1 && grep -qEi "org\.springframework\.boot|spring-boot" build.gradle*; then
+            echo "Detected Spring Boot Gradle project"
+            if [[ -f "gradlew" ]]; then
+              chmod +x gradlew
+              ./gradlew --no-daemon clean bootJar
+            else
+              gradle --no-daemon clean bootJar
+            fi
+          else
+            echo "No Spring Boot project files found. Skipping Spring Boot build check."
+          fi
