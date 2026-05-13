@@ -5,6 +5,9 @@ on:
   push:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   java-build-check:
     name: Java build check
@@ -72,13 +75,22 @@ jobs:
             else
               mvn -B -ntp clean verify
             fi
-          elif ls build.gradle* >/dev/null 2>&1 && grep -qEi "org\.springframework\.boot|spring-boot" build.gradle*; then
-            echo "Detected Spring Boot Gradle project"
-            if [[ -f "gradlew" ]]; then
-              chmod +x gradlew
-              ./gradlew --no-daemon clean bootJar
+          elif [[ -f "build.gradle" || -f "build.gradle.kts" ]]; then
+            gradle_file="build.gradle"
+            if [[ -f "build.gradle.kts" ]]; then
+              gradle_file="build.gradle.kts"
+            fi
+
+            if grep -qEi "org\.springframework\.boot|spring-boot" "$gradle_file"; then
+              echo "Detected Spring Boot Gradle project"
+              if [[ -f "gradlew" ]]; then
+                chmod +x gradlew
+                ./gradlew --no-daemon clean build
+              else
+                gradle --no-daemon clean build
+              fi
             else
-              gradle --no-daemon clean bootJar
+              echo "No Spring Boot project files found. Skipping Spring Boot build check."
             fi
           else
             echo "No Spring Boot project files found. Skipping Spring Boot build check."
