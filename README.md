@@ -27,7 +27,7 @@ Shelfd is a full-stack web application designed for media enthusiasts to create 
 
 ### Build & Deployment
 - **Backend Build:** Maven/Gradle
-- **Frontend Build:** (Your build tool - e.g., Webpack, Vite)
+- **Frontend Build:** -TBA-
 
 ---
 
