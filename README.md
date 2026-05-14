@@ -22,3 +22,6 @@ A social media-inspired review platform where users can track, review, and share
 - Visit other user profiles
 - Read other users’ reviews
 - Follow reading/watching activity (if time permits)
+### Shelf Creation
+- Create and share your shelf
+- Collaborate on a shelf and watch movies/series with friends
