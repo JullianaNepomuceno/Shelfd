@@ -1,0 +1,504 @@
+/* ─── Shelfd Auth Shared Styles ─────────────────────────────────────────────── */
+
+.auth-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ── Left decorative panel ── */
+.auth-left {
+    width: 42%;
+    background: var(--ink);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 40px 36px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.auth-left__grid {
+    position: absolute;
+    inset: 0;
+    opacity: 0.07;
+    background-image: repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 18px,
+            rgba(255, 255, 255, 0.5) 18px,
+            rgba(255, 255, 255, 0.5) 19px
+    );
+    pointer-events: none;
+}
+
+/* Brand */
+.auth-brand {
+    position: relative;
+    z-index: 2;
+}
+
+.auth-brand__name {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.auth-brand__tagline {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.45);
+    margin-top: 7px;
+    font-weight: 300;
+    line-height: 1.55;
+}
+
+/* Spine stack */
+.spine-stack {
+    display: flex;
+    gap: 4px;
+    align-items: flex-end;
+    height: 160px;
+    position: relative;
+    z-index: 2;
+}
+
+.spine-book {
+    border-radius: 2px 3px 3px 2px;
+    width: 22px;
+    position: relative;
+    transition: transform 0.3s ease;
+    cursor: default;
+    flex-shrink: 0;
+}
+
+.spine-book:hover {
+    transform: translateY(-10px);
+}
+
+.spine-book__title {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 8px;
+    font-family: var(--font-body);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.55);
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    translate: -50% 0;
+    white-space: nowrap;
+    overflow: hidden;
+    max-height: 80%;
+}
+
+/* Quote */
+.auth-quote {
+    position: relative;
+    z-index: 2;
+}
+
+.auth-quote blockquote {
+    font-family: var(--font-display);
+    font-size: 14.5px;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.65);
+    line-height: 1.65;
+    border-left: 2px solid var(--spine);
+    padding-left: 14px;
+}
+
+.auth-quote cite {
+    display: block;
+    font-family: var(--font-body);
+    font-style: normal;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.3);
+    margin-top: 10px;
+    padding-left: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ── Right form panel ── */
+.auth-right {
+    flex: 1;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 48px 52px;
+    overflow-y: auto;
+}
+
+/* Form header */
+.form-header {
+    margin-bottom: 30px;
+}
+
+.form-title {
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--ink);
+    letter-spacing: -0.3px;
+}
+
+.form-subtitle {
+    font-size: 13.5px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-weight: 300;
+}
+
+.form-subtitle a {
+    color: var(--spine);
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.form-subtitle a:hover {
+    text-decoration: underline;
+}
+
+/* Form groups */
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.form-label {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 7px;
+}
+
+.form-input {
+    width: 100%;
+    height: 44px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 0 14px;
+    font-size: 14px;
+    font-family: var(--font-body);
+    color: var(--ink);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    outline: none;
+    appearance: none;
+}
+
+.form-input:hover {
+    border-color: rgba(26, 22, 16, 0.3);
+}
+
+.form-input:focus {
+    border-color: var(--spine);
+    box-shadow: 0 0 0 3px rgba(196, 83, 42, 0.12);
+}
+
+.form-input::placeholder {
+    color: #C2BCB3;
+}
+
+/* Password wrapper */
+.password-wrapper {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 16px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    line-height: 1;
+    transition: color 0.15s;
+}
+
+.password-toggle:hover {
+    color: var(--ink);
+}
+
+.password-input {
+    padding-right: 42px;
+}
+
+/* Divider */
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.auth-divider__line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
+.auth-divider__text {
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+}
+
+/* Primary button */
+.btn-primary {
+    width: 100%;
+    height: 46px;
+    background: var(--ink);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    transition: background 0.2s ease, transform 0.1s ease;
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-primary:hover {
+    background: var(--ink-soft);
+}
+
+.btn-primary:active {
+    transform: scale(0.99);
+}
+
+/* OAuth buttons */
+.oauth-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.btn-oauth {
+    height: 40px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--white);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.btn-oauth:hover {
+    border-color: var(--spine);
+    background: var(--spine-light);
+}
+
+/* Forgot link */
+.forgot-link {
+    text-align: right;
+    margin-top: -10px;
+    margin-bottom: 18px;
+}
+
+.forgot-link a {
+    font-size: 12px;
+    color: var(--muted);
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.15s;
+}
+
+.forgot-link a:hover {
+    color: var(--spine);
+}
+
+/* Terms */
+.terms-text {
+    font-size: 11.5px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 16px;
+    line-height: 1.55;
+}
+
+.terms-text a {
+    color: var(--spine);
+    text-decoration: none;
+}
+
+/* Step indicators */
+.step-indicators {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 24px;
+}
+
+.step-dot {
+    height: 3px;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    background: var(--border);
+    width: 12px;
+}
+
+.step-dot--active {
+    background: var(--spine);
+    width: 28px;
+}
+
+.step-dot--done {
+    background: var(--ink);
+    width: 12px;
+}
+
+/* Media / genre chips */
+.chip-section-label {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+}
+
+.chip-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.chip {
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: var(--white);
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    user-select: none;
+}
+
+.chip:hover {
+    border-color: var(--spine);
+    color: var(--spine);
+}
+
+.chip--selected {
+    background: var(--spine);
+    border-color: var(--spine);
+    color: var(--white);
+}
+
+/* Profile preview card */
+.profile-preview {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.profile-preview__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.avatar-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--spine-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--spine);
+    flex-shrink: 0;
+}
+
+.profile-preview__name {
+    font-weight: 500;
+    font-size: 15px;
+    color: var(--ink);
+}
+
+.profile-preview__meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    text-align: center;
+}
+
+.stat-card {
+    background: var(--cream);
+    border-radius: var(--radius-md);
+    padding: 10px 6px;
+}
+
+.stat-card__number {
+    font-size: 18px;
+    font-weight: 600;
+    font-family: var(--font-display);
+    color: var(--ink);
+}
+
+.stat-card__label {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .auth-left {
+        display: none;
+    }
+
+    .auth-right {
+        padding: 36px 28px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
