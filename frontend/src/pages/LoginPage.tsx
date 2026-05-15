@@ -6,22 +6,34 @@ const SPINE_BOOKS = [
     { height: 110, color: '#8B2E12', title: 'Dune' },
     { height: 140, color: '#4A5568', title: 'Foundation' },
     { height: 95,  color: '#2D6A4F', title: 'Watchmen' },
-    { height: 125, color: '#C4532A', title: 'Breaking Bad' },
-    { height: 80,  color: '#6B4C3B', title: 'Sandman' },
+    { height: 125, color: '#C4532A', title: 'Pride & Prejudice' },
+    { height: 80,  color: '#8B7355', title: 'Sapiens' },
     { height: 150, color: '#1A365D', title: 'LOTR' },
     { height: 105, color: '#553C9A', title: 'Arrival' },
     { height: 90,  color: '#744210', title: 'Parasite' },
-    { height: 135, color: '#276749', title: 'Sapiens' },
-    { height: 115, color: '#742A2A', title: 'Dark' },
+    { height: 130, color: '#276749', title: 'Spirited Away' },
+    { height: 115, color: '#742A2A', title: 'Daredevil' },
 ];
 
-const ShelfdLogo: React.FC = () => (
-    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+/* ── Logo SVG (dark bg version — white/orange spines) ── */
+const ShelfdLogoWhite: React.FC = () => (
+    <svg width="24" height="24" viewBox="0 0 22 22" fill="none" aria-hidden="true">
         <rect x="1"  y="3"  width="4" height="16" rx="1" fill="#C4532A" />
         <rect x="7"  y="5"  width="3" height="14" rx="1" fill="rgba(255,255,255,0.5)" />
         <rect x="12" y="2"  width="5" height="17" rx="1" fill="rgba(255,255,255,0.3)" />
         <rect x="19" y="6"  width="2" height="13" rx="1" fill="rgba(255,255,255,0.6)" />
-        <rect x="0"  y="18" width="22" height="2" rx="1" fill="rgba(255,255,255,0.25)" />
+        <rect x="0"  y="18" width="22" height="2"  rx="1" fill="rgba(255,255,255,0.2)" />
+    </svg>
+);
+
+/* ── Logo SVG (light bg version — ink/orange spines) ── */
+const ShelfdLogoInk: React.FC = () => (
+    <svg width="44" height="44" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+        <rect x="1"  y="3"  width="4" height="16" rx="1" fill="#C4532A" />
+        <rect x="7"  y="5"  width="3" height="14" rx="1" fill="rgba(26,22,16,0.45)" />
+        <rect x="12" y="2"  width="5" height="17" rx="1" fill="rgba(26,22,16,0.28)" />
+        <rect x="19" y="6"  width="2" height="13" rx="1" fill="rgba(26,22,16,0.55)" />
+        <rect x="0"  y="18" width="22" height="2"  rx="1" fill="rgba(26,22,16,0.15)" />
     </svg>
 );
 
@@ -51,19 +63,20 @@ const LoginPage: React.FC = () => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // TODO: wire up to Spring Boot POST /api/auth/login
+        // TODO: POST /api/auth/login
         console.log('Login payload:', formData);
     };
 
     return (
         <div className="auth-layout">
+
             {/* ── Left panel ── */}
             <aside className="auth-left" aria-hidden="true">
                 <div className="auth-left__grid" />
 
                 <div className="auth-brand">
                     <div className="auth-brand__name">
-                        <ShelfdLogo />
+                        <ShelfdLogoWhite />
                         Shelfd
                     </div>
                     <p className="auth-brand__tagline">
@@ -71,16 +84,18 @@ const LoginPage: React.FC = () => {
                     </p>
                 </div>
 
-                <div className="spine-stack">
-                    {SPINE_BOOKS.map((book, i) => (
-                        <div
-                            key={i}
-                            className="spine-book"
-                            style={{ height: book.height, background: book.color }}
-                        >
-                            <span className="spine-book__title">{book.title}</span>
-                        </div>
-                    ))}
+                <div className="spine-stack-wrapper">
+                    <div className="spine-stack">
+                        {SPINE_BOOKS.map((book, i) => (
+                            <div
+                                key={i}
+                                className="spine-book"
+                                style={{ height: book.height, background: book.color }}
+                            >
+                                <span className="spine-book__title">{book.title}</span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
                 <div className="auth-quote">
@@ -89,91 +104,91 @@ const LoginPage: React.FC = () => {
                 </div>
             </aside>
 
-            {/* ── Right form panel ── */}
+            {/* ── Right panel ── */}
             <main className="auth-right">
-                <div className="form-header">
-                    <h1 className="form-title">Welcome back</h1>
-                    <p className="form-subtitle">
-                        Don't have an account?{' '}
-                        <a onClick={() => navigate('/signup')} role="button" tabIndex={0}>
-                            Sign up free
-                        </a>
-                    </p>
-                </div>
+                <div className="auth-right-inner">
 
-                <form onSubmit={handleSubmit} noValidate>
-                    <div className="form-group">
-                        <label htmlFor="email" className="form-label">Email</label>
-                        <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            className="form-input"
-                            placeholder="you@example.com"
-                            value={formData.email}
-                            onChange={handleChange}
-                            autoComplete="email"
-                            required
-                        />
+                    {/* Logo above form */}
+                    <div className="auth-right-logo">
+                        <ShelfdLogoInk />
+                        <span className="auth-right-logo__name">Shelfd</span>
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="password" className="form-label">Password</label>
-                        <div className="password-wrapper">
+                    <div className="form-header">
+                        <h1 className="form-title">Welcome back</h1>
+                        <p className="form-subtitle">
+                            Don't have an account?{' '}
+                            <a onClick={() => navigate('/signup')} role="button" tabIndex={0}>
+                                Sign up free
+                            </a>
+                        </p>
+                    </div>
+
+                    <form onSubmit={handleSubmit} noValidate>
+                        <div className="form-group">
+                            <label htmlFor="email" className="form-label">Email</label>
                             <input
-                                id="password"
-                                name="password"
-                                type={showPassword ? 'text' : 'password'}
-                                className="form-input password-input"
-                                placeholder="••••••••"
-                                value={formData.password}
+                                id="email"
+                                name="email"
+                                type="email"
+                                className="form-input"
+                                placeholder="you@example.com"
+                                value={formData.email}
                                 onChange={handleChange}
-                                autoComplete="current-password"
+                                autoComplete="email"
                                 required
                             />
-                            <button
-                                type="button"
-                                className="password-toggle"
-                                onClick={() => setShowPassword(v => !v)}
-                                aria-label={showPassword ? 'Hide password' : 'Show password'}
-                            >
-                                <i className={showPassword ? 'ti ti-eye-off' : 'ti ti-eye'} />
-                            </button>
                         </div>
+
+                        <div className="form-group">
+                            <label htmlFor="password" className="form-label">Password</label>
+                            <div className="password-wrapper">
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    className="form-input password-input"
+                                    placeholder="••••••••"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    autoComplete="current-password"
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    className="password-toggle"
+                                    onClick={() => setShowPassword(v => !v)}
+                                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                >
+                                    <i className={showPassword ? 'ti ti-eye-off' : 'ti ti-eye'} />
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="forgot-link">
+                            <a href="/forgot-password">Forgot your password?</a>
+                        </div>
+
+                        <button type="submit" className="btn-primary">Log in</button>
+                    </form>
+
+                    <div className="auth-divider">
+                        <div className="auth-divider__line" />
+                        <span className="auth-divider__text">or continue with</span>
+                        <div className="auth-divider__line" />
                     </div>
 
-                    <div className="forgot-link">
-                        <a href="/forgot-password">Forgot your password?</a>
+                    <div className="oauth-grid">
+                        <button type="button" className="btn-oauth">
+                            <GoogleIcon />
+                            Google
+                        </button>
+                        <button type="button" className="btn-oauth">
+                            <GitHubIcon />
+                            GitHub
+                        </button>
                     </div>
 
-                    <button type="submit" className="btn-primary">
-                        Sign in
-                    </button>
-                </form>
-
-                <div className="auth-divider">
-                    <div className="auth-divider__line" />
-                    <span className="auth-divider__text">or continue with</span>
-                    <div className="auth-divider__line" />
-                </div>
-
-                <div className="oauth-grid">
-                    <button
-                        type="button"
-                        className="btn-oauth"
-                        onClick={() => {/* TODO: Spring Security OAuth2 /oauth2/authorization/google */}}
-                    >
-                        <GoogleIcon />
-                        Google
-                    </button>
-                    <button
-                        type="button"
-                        className="btn-oauth"
-                        onClick={() => {/* TODO: Spring Security OAuth2 /oauth2/authorization/github */}}
-                    >
-                        <GitHubIcon />
-                        GitHub
-                    </button>
                 </div>
             </main>
         </div>

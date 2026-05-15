@@ -7,13 +7,13 @@
 
 /* ── Left decorative panel ── */
 .auth-left {
-    width: 42%;
+    width: 32%;
     background: var(--ink);
     position: relative;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 40px 36px;
+    padding: 36px 28px;
     overflow: hidden;
     flex-shrink: 0;
 }
@@ -32,7 +32,7 @@
     pointer-events: none;
 }
 
-/* Brand */
+/* Brand (left panel) */
 .auth-brand {
     position: relative;
     z-index: 2;
@@ -40,13 +40,13 @@
 
 .auth-brand__name {
     font-family: var(--font-display);
-    font-size: 28px;
+    font-size: 20px;
     font-weight: 700;
     color: #fff;
     letter-spacing: -0.5px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .auth-brand__tagline {
@@ -57,19 +57,26 @@
     line-height: 1.55;
 }
 
-/* Spine stack */
+/* Spine stack — always centered in the left panel */
+.spine-stack-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+    padding: 24px 0;
+}
+
 .spine-stack {
     display: flex;
     gap: 4px;
     align-items: flex-end;
-    height: 160px;
-    position: relative;
-    z-index: 2;
 }
 
 .spine-book {
     border-radius: 2px 3px 3px 2px;
-    width: 22px;
+    width: 18px;
     position: relative;
     transition: transform 0.3s ease;
     cursor: default;
@@ -132,21 +139,46 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 48px 52px;
+    align-items: center;
     overflow-y: auto;
+    padding: 48px 40px;
+}
+
+/* Inner container — constrains max width and stacks logo + form */
+.auth-right-inner {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Logo above the form title */
+.auth-right-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 28px;
+}
+
+.auth-right-logo__name {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.8px;
 }
 
 /* Form header */
 .form-header {
-    margin-bottom: 30px;
+    margin-bottom: 28px;
 }
 
 .form-title {
     font-family: var(--font-display);
-    font-size: 26px;
+    font-size: 22px;
     font-weight: 500;
     color: var(--ink);
-    letter-spacing: -0.3px;
+    letter-spacing: -0.2px;
 }
 
 .form-subtitle {

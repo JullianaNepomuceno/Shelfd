@@ -1,86 +1,40 @@
 # Shelfd 📚
 
-A social media-inspired review platform where users can track, review, and share their favorite books, comics, movies, and TV shows. Build your digital shelf, discover recommendations, and connect with a community of fellow enthusiasts.
+A social media-inspired review platform where users can track, review, and share their favorite books, comics, movies, and TV shows. Users can create profiles, post reviews, display their current reads/watchlist, and browse other users’ reviews and recommendations.
 
 ---
 
-## 🎯 Overview
+## Tech Stack 🛠️
 
-Shelfd is a full-stack web application designed for media enthusiasts to create personalized digital shelves, write and read reviews, rate content, and engage with other users. Whether you're tracking your reading list, current watchlist, or sharing your thoughts on the latest releases, Shelfd provides an intuitive platform to manage and celebrate your media consumption.
-
----
-
-## 🛠️ Tech Stack
-
-### Backend
-- **Framework:** Java Spring Boot
-- **Language:** Java
-- **Database:** PostgreSQL/MySQL
-- **Authentication:** Spring Security
-- **API:** RESTful API
-
-### Frontend
-- **Language:** TypeScript
-- **Markup:** HTML5
-- **Styling:** CSS3
-- **Framework:** -TBA-
-
-### Build & Deployment
-- **Backend Build:** Maven/Gradle
-- **Frontend Build:** -TBA-
+- **Backend:** Java, Spring Boot, Spring Security, Spring Data JPA
+- **Database:** PostgreSQL
+- **Frontend:** React, TypeScript, HTML, CSS
+- **Build Tools:** Maven
+- **Other:** Lombok
 
 ---
 
-## ✨ Features
-
-### 🔐 Authentication & Authorization
+## Features ✨
+### Authentication 🔐
 - User registration and login
 - Secure password encryption using Spring Security
-- JWT token-based authentication
-- Role-based access control
-
-### 👤 User Profiles
-- Custom profile page with personalized styling
-- Bio and profile picture upload
+### User Profiles 👤
+- Custom profile page
+- Bio and profile picture
 - Display currently reading/watching media
-- View posted reviews and ratings
-- Profile settings and account management
-- Activity history
-
-### 📝 Reviews & Ratings
-- Create, read, update, and delete reviews
-- Star rating system (1-5 stars or custom scale)
-- Add media to personal shelf during review
-- Write detailed review comments
-- View review history
-- Like/helpful review interaction
-
-### 🎬 Media Browsing & Search
-- Browse available media (books, comics, movies, TV shows)
-- Advanced search by title, author, director, or genre
-- Filter and sort media by rating and release date
-- View detailed media information
-- Community ratings and review aggregation
-- Media recommendations based on ratings
-
-### 👥 Social Features
+- View posted reviews
+### Reviews & Ratings 📝
+- Create reviews for books, comics, movies, and TV shows
+- Star rating system
+- Edit or delete reviews
+### Media Browsing 🎬
+- Browse available media
+- Search media by title
+- View community reviews and ratings
+### Social Features 👥
 - Visit other user profiles
-- Read other users' reviews
-- Follow/unfollow users
-- View trending media and reviews
-- Discover popular shelves
-- Comment on reviews (if time permits)
-
-### 📚 Shelf Management
-- Create personal shelves (Read, Currently Reading, Want to Read, etc.)
-- Customize shelf names and descriptions
-- Organize media within shelves
-- Share shelves with other users
-- Collaborative shelf viewing
-- Shelf statistics (total items, average rating, etc.)
-
-### 📊 Dashboard
-- Personal activity feed
-- Quick access to saved media
-- Review statistics
-- Recommended content based on interests
+- Read other users’ reviews
+- Follow reading/watching activity (if time permits)
+### Shelf Creation ✏️
+- Create and share your shelf
+- Collaborate on a shelf
