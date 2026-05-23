@@ -1,10 +1,10 @@
-# Shelfd 📚
+# Shelfd
 
-A social media-inspired review platform where users can track, review, and share their favorite books, comics, movies, and TV shows. Users can create profiles, post reviews, display their current reads/watchlist, and browse other users’ reviews and recommendations.
+Shelfd is a simple media tracker where users can organize movies, books, comics, TV shows, and games into personal shelves. Track your progress, manage your backlog, and keep all your favorite media in one place.
 
 ---
 
-## Tech Stack 🛠️
+## Tech Stack
 
 - **Backend:** Java, Spring Boot, Spring Security, Spring Data JPA
 - **Database:** PostgreSQL
@@ -14,27 +14,24 @@ A social media-inspired review platform where users can track, review, and share
 
 ---
 
-## Features ✨
-### Authentication 🔐
-- User registration and login
-- Secure password encryption using Spring Security
-### User Profiles 👤
-- Custom profile page
-- Bio and profile picture
-- Display currently reading/watching media
-- View posted reviews
-### Reviews & Ratings 📝
-- Create reviews for books, comics, movies, and TV shows
-- Star rating system
-- Edit or delete reviews
-### Media Browsing 🎬
-- Browse available media
-- Search media by title
-- View community reviews and ratings
-### Social Features 👥
-- Visit other user profiles
-- Read other users’ reviews
-- Follow reading/watching activity (if time permits)
-### Shelf Creation ✏️
-- Create and share your shelf
-- Collaborate on a shelf
+## Features
+
+- User login and registration
+- Create and manage shelves
+- Add movies, books, comics, TV shows, and games
+- Track media status:
+    - Finished
+    - Unfinished
+    - In-Progress
+- Edit or delete media entries
+- Rate media items
+- Optional shelf sharing
+
+---
+
+## User Flow
+
+1. Create or log into your account.
+2. Create or select an existing shelf.
+3. Input media name, type, author/creator, media link (optional), rating, and status (finished, unfinished, in-progress), or edit an existing entry.
+4. (Optional) Share your shelf with friends.
