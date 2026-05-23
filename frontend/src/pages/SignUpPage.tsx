@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AuthLeftPanel, { ShelfdLogoInk } from '../components/AuthLeftPanel';
 import './auth.css';
 
-// ── Types ────────────────────────────────────────────────────────────────────
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 interface FormData {
     firstName: string;
@@ -45,28 +46,6 @@ const GENRES: Genre[] = [
     'Thriller', 'Horror', 'Non-fiction', 'Comedy',
 ];
 
-// ── Logo components ───────────────────────────────────────────────────────────
-
-const ShelfdLogoWhite: React.FC = () => (
-    <svg width="24" height="24" viewBox="0 0 22 22" fill="none" aria-hidden="true">
-        <rect x="1"  y="3"  width="4" height="16" rx="1" fill="#C4532A" />
-        <rect x="7"  y="5"  width="3" height="14" rx="1" fill="rgba(255,255,255,0.5)" />
-        <rect x="12" y="2"  width="5" height="17" rx="1" fill="rgba(255,255,255,0.3)" />
-        <rect x="19" y="6"  width="2" height="13" rx="1" fill="rgba(255,255,255,0.6)" />
-        <rect x="0"  y="18" width="22" height="2"  rx="1" fill="rgba(255,255,255,0.2)" />
-    </svg>
-);
-
-const ShelfdLogoInk: React.FC = () => (
-    <svg width="44" height="44" viewBox="0 0 22 22" fill="none" aria-hidden="true">
-        <rect x="1"  y="3"  width="4" height="16" rx="1" fill="#C4532A" />
-        <rect x="7"  y="5"  width="3" height="14" rx="1" fill="rgba(26,22,16,0.45)" />
-        <rect x="12" y="2"  width="5" height="17" rx="1" fill="rgba(26,22,16,0.28)" />
-        <rect x="19" y="6"  width="2" height="13" rx="1" fill="rgba(26,22,16,0.55)" />
-        <rect x="0"  y="18" width="22" height="2"  rx="1" fill="rgba(26,22,16,0.15)" />
-    </svg>
-);
-
 // ── Step indicators ───────────────────────────────────────────────────────────
 
 interface StepIndicatorsProps { current: number; total: number; }
@@ -83,7 +62,7 @@ const StepIndicators: React.FC<StepIndicatorsProps> = ({ current, total }) => (
     </div>
 );
 
-// ── Main component ────────────────────────────────────────────────────────────
+// ── Component ─────────────────────────────────────────────────────────────────
 
 const SignUpPage: React.FC = () => {
     const navigate = useNavigate();
@@ -134,46 +113,16 @@ const SignUpPage: React.FC = () => {
     return (
         <div className="auth-layout">
 
-            {/* ── Left panel ── */}
-            <aside className="auth-left" aria-hidden="true">
-                <div className="auth-left__grid" />
+            <AuthLeftPanel
+                tagline="Track. Review. Discover. Build your digital shelf."
+                quote="Not all those who wander are lost."
+                quoteAuthor="J.R.R. Tolkien"
+                books={SPINE_BOOKS}
+            />
 
-                <div className="auth-brand">
-                    <div className="auth-brand__name">
-                        <ShelfdLogoWhite />
-                        Shelfd
-                    </div>
-                    <p className="auth-brand__tagline">
-                        Track. Review. Discover.<br />Build your digital shelf.
-                    </p>
-                </div>
-
-                {/* Centered spine stack */}
-                <div className="spine-stack-wrapper">
-                    <div className="spine-stack">
-                        {SPINE_BOOKS.map((book, i) => (
-                            <div
-                                key={i}
-                                className="spine-book"
-                                style={{ height: book.height, background: book.color }}
-                            >
-                                <span className="spine-book__title">{book.title}</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="auth-quote">
-                    <blockquote>"Not all those who wander are lost."</blockquote>
-                    <cite>— J.R.R. Tolkien</cite>
-                </div>
-            </aside>
-
-            {/* ── Right panel ── */}
             <main className="auth-right">
                 <div className="auth-right-inner">
 
-                    {/* Logo above form */}
                     <div className="auth-right-logo">
                         <ShelfdLogoInk />
                         <span className="auth-right-logo__name">Shelfd</span>
@@ -302,7 +251,11 @@ const SignUpPage: React.FC = () => {
                                     </div>
                                 </div>
                                 <div className="stats-grid">
-                                    {[{ label: 'On shelf', value: 0 }, { label: 'Reviews', value: 0 }, { label: 'Following', value: 0 }].map(s => (
+                                    {[
+                                        { label: 'On shelf', value: 0 },
+                                        { label: 'Reviews',  value: 0 },
+                                        { label: 'Following', value: 0 },
+                                    ].map(s => (
                                         <div key={s.label} className="stat-card">
                                             <div className="stat-card__number">{s.value}</div>
                                             <div className="stat-card__label">{s.label}</div>
