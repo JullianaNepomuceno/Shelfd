@@ -1,0 +1,186 @@
+# CONTEXT_RULES_AND_FLOW.txt
+
+PROJECT: Shelfd
+TYPE: Full-Stack Media Tracker / To-Do List Application
+
+==================================================
+PROJECT CONTEXT
+==================================================
+
+Shelfd is a simple media tracking application where users can create shelves and organize media such as:
+
+- Movies
+- TV Shows
+- Books
+- Comics / Manga
+- Games
+
+Users can:
+- Register and log in
+- Create shelves
+- Add media entries
+- Edit or delete entries
+- Track status (Finished, Unfinished, In-Progress)
+- Rate media
+- Optionally share shelves
+
+The project focuses on simplicity, clean UI, CRUD operations, authentication, and learning full-stack development.
+
+==================================================
+TECH STACK
+==================================================
+
+Backend:
+- Java
+- Spring Boot
+- Spring Data JPA
+- Spring Security
+- Maven
+
+Frontend:
+- React
+- TypeScript
+- HTML/CSS
+
+Database:
+- PostgreSQL
+
+==================================================
+VIBE CODING RULES
+==================================================
+
+1. KEEP IT SIMPLE
+- Do not overengineer features.
+- Prefer readable code over clever code.
+- Build core functionality first.
+
+2. BEGINNER-FRIENDLY CODE
+- Use clear naming conventions.
+- Keep logic understandable.
+- Avoid unnecessary abstractions.
+
+3. CLEAN UI
+- Minimal and organized layout.
+- Consistent spacing and colors.
+- Responsive when possible.
+
+4. SMALL COMPONENTS
+- Components should do one thing only.
+- Avoid giant frontend files.
+
+5. CLEAN BACKEND STRUCTURE
+- Controllers handle requests.
+- Services handle business logic.
+- Repositories handle database access.
+
+6. DO NOT MIX RESPONSIBILITIES
+Bad:
+- Controller doing database logic
+
+Good:
+- Controller → Service → Repository
+
+7. CONSISTENT NAMING
+Examples:
+- UserController
+- ShelfService
+- MediaRepository
+- MediaItemDTO
+
+8. SHORT METHODS
+Methods should only perform one clear task.
+
+9. NO DUPLICATE CODE
+Extract reusable logic when needed.
+
+10. ALWAYS TEST FEATURES
+Before moving on:
+- Check backend endpoints
+- Check frontend rendering
+- Check database behavior
+
+==================================================
+PROJECT FLOW
+==================================================
+
+AUTH FLOW
+1. User registers
+2. User logs in
+3. User accesses dashboard
+
+SHELF FLOW
+1. User creates shelf
+2. User views shelf
+3. User edits or deletes shelf
+
+MEDIA FLOW
+1. User adds media item
+2. User selects:
+   - Title
+   - Type
+   - Creator/Author
+   - Media Link (Optional)
+   - Status
+   - Rating
+3. User saves entry
+4. User can edit/delete later
+
+OPTIONAL SHARE FLOW
+1. User shares shelf
+2. Other users can view shelf
+
+==================================================
+DATABASE STRUCTURE IDEA
+==================================================
+
+User
+- id
+- username
+- email
+- password
+
+Shelf
+- id
+- name
+- user_id
+
+MediaItem
+- id
+- title
+- mediaType
+- creator
+- status
+- rating
+- mediaLink
+- shelf_id
+
+==================================================
+CODING PRIORITIES
+==================================================
+
+Priority 1:
+- Authentication
+- CRUD functionality
+- Database connection
+
+Priority 2:
+- Dashboard UI
+- Search/filter
+- Better styling
+
+Priority 3:
+- Sharing shelves
+- Favorites
+- Dark mode
+
+==================================================
+GOAL
+==================================================
+
+Create a clean, functional, and maintainable media tracker project that demonstrates:
+- Full-stack development
+- CRUD operations
+- Authentication
+- OOP principles
+- REST API development
+- Frontend/backend integration
