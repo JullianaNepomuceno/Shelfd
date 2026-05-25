@@ -44,11 +44,11 @@ public class User implements UserDetails {
     // ── Getters ───────────────────────────────────────────────────────────────
 
     public Long getId() { return id; }
-    public String getUsername() { return email; }
     public String getEmail() { return email; }
     public String getPassword() { return password; }
     public String getFirstName() { return firstName; }
     public String getLastName() { return lastName; }
+    public String getDisplayUsername() { return username; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 
     // ── Setters ───────────────────────────────────────────────────────────────
@@ -60,6 +60,9 @@ public class User implements UserDetails {
     public void setLastName(String lastName) { this.lastName = lastName; }
 
     // ── UserDetails ───────────────────────────────────────────────────────────
+
+    @Override
+    public String getUsername() { return email; }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() { return List.of(); }

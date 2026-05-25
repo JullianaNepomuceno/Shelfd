@@ -1,0 +1,48 @@
+import api from './api';
+
+export type MediaType = 'MOVIE' | 'BOOK' | 'COMIC' | 'TV_SHOW' | 'GAME';
+export type MediaStatus = 'FINISHED' | 'UNFINISHED' | 'IN_PROGRESS';
+
+export interface MediaItemRequest {
+    title: string;
+    creator: string;
+    mediaLink?: string;
+    type: MediaType;
+    status: MediaStatus;
+    rating?: number;
+}
+
+export interface MediaItemResponse {
+    id: number;
+    title: string;
+    creator: string;
+    mediaLink?: string;
+    type: MediaType;
+    status: MediaStatus;
+    rating?: number;
+    shelfId: number;
+    createdAt: string;
+}
+
+const mediaService = {
+    getMediaItems: async (shelfId: number): Promise<MediaItemResponse[]> => {
+        const response = await api.get<MediaItemResponse[]>(`/shelves/${shelfId}/media`);
+        return response.data;
+    },
+
+    addMediaItem: async (shelfId: number, payload: MediaItemRequest): Promise<MediaItemResponse> => {
+        const response = await api.post<MediaItemResponse>(`/shelves/${shelfId}/media`, payload);
+        return response.data;
+    },
+
+    updateMediaItem: async (shelfId: number, itemId: number, payload: MediaItemRequest): Promise<MediaItemResponse> => {
+        const response = await api.put<MediaItemResponse>(`/shelves/${shelfId}/media/${itemId}`, payload);
+        return response.data;
+    },
+
+    deleteMediaItem: async (shelfId: number, itemId: number): Promise<void> => {
+        await api.delete(`/shelves/${shelfId}/media/${itemId}`);
+    },
+};
+
+export default mediaService;

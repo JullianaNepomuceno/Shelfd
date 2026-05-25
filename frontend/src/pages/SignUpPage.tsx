@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AuthLeftPanel, { ShelfdLogoInk } from '../components/AuthLeftPanel';
+import authService from '../services/authService';
 import './auth.css';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -46,6 +46,28 @@ const GENRES: Genre[] = [
     'Thriller', 'Horror', 'Non-fiction', 'Comedy',
 ];
 
+// ── Logo components ───────────────────────────────────────────────────────────
+
+const ShelfdLogoWhite: React.FC = () => (
+    <svg width="24" height="24" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+        <rect x="1"  y="3"  width="4" height="16" rx="1" fill="#C4532A" />
+        <rect x="7"  y="5"  width="3" height="14" rx="1" fill="rgba(255,255,255,0.5)" />
+        <rect x="12" y="2"  width="5" height="17" rx="1" fill="rgba(255,255,255,0.3)" />
+        <rect x="19" y="6"  width="2" height="13" rx="1" fill="rgba(255,255,255,0.6)" />
+        <rect x="0"  y="18" width="22" height="2"  rx="1" fill="rgba(255,255,255,0.2)" />
+    </svg>
+);
+
+const ShelfdLogoInk: React.FC = () => (
+    <svg width="44" height="44" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+        <rect x="1"  y="3"  width="4" height="16" rx="1" fill="#C4532A" />
+        <rect x="7"  y="5"  width="3" height="14" rx="1" fill="rgba(26,22,16,0.45)" />
+        <rect x="12" y="2"  width="5" height="17" rx="1" fill="rgba(26,22,16,0.28)" />
+        <rect x="19" y="6"  width="2" height="13" rx="1" fill="rgba(26,22,16,0.55)" />
+        <rect x="0"  y="18" width="22" height="2"  rx="1" fill="rgba(26,22,16,0.15)" />
+    </svg>
+);
+
 // ── Step indicators ───────────────────────────────────────────────────────────
 
 interface StepIndicatorsProps { current: number; total: number; }
@@ -68,6 +90,8 @@ const SignUpPage: React.FC = () => {
     const navigate = useNavigate();
     const [step, setStep] = useState<1 | 2 | 3>(1);
     const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const [formData, setFormData] = useState<FormData>({
         firstName: '', lastName: '', username: '', email: '', password: '',
@@ -97,9 +121,19 @@ const SignUpPage: React.FC = () => {
         setStep(2);
     };
 
-    const handleFinalSubmit = () => {
-        // TODO: POST /api/auth/register
-        console.log('Registration payload:', { ...formData, mediaTypes: selectedMedia, genres: selectedGenres });
+    const handleFinalSubmit = async () => {
+        setError('');
+        setLoading(true);
+        try {
+            const data = await authService.register(formData);
+            authService.saveSession(data);
+            navigate('/dashboard');
+        } catch (err: any) {
+            setError('Registration failed. Email or username may already be taken.');
+            setStep(1);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const initials =
@@ -113,12 +147,32 @@ const SignUpPage: React.FC = () => {
     return (
         <div className="auth-layout">
 
-            <AuthLeftPanel
-                tagline="Track. Review. Discover. Build your digital shelf."
-                quote="Not all those who wander are lost."
-                quoteAuthor="J.R.R. Tolkien"
-                books={SPINE_BOOKS}
-            />
+            <aside className="auth-left" aria-hidden="true">
+                <div className="auth-left__grid" />
+                <div className="auth-brand">
+                    <div className="auth-brand__name">
+                        <ShelfdLogoWhite />
+                        Shelfd
+                    </div>
+                    <p className="auth-brand__tagline">
+                        Track. Review. Discover.<br />Build your digital shelf.
+                    </p>
+                </div>
+                <div className="spine-stack-wrapper">
+                    <div className="spine-stack">
+                        {SPINE_BOOKS.map((book, i) => (
+                            <div key={i} className="spine-book"
+                                 style={{ height: book.height, background: book.color }}>
+                                <span className="spine-book__title">{book.title}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+                <div className="auth-quote">
+                    <blockquote>"Not all those who wander are lost."</blockquote>
+                    <cite>— J.R.R. Tolkien</cite>
+                </div>
+            </aside>
 
             <main className="auth-right">
                 <div className="auth-right-inner">
@@ -129,6 +183,8 @@ const SignUpPage: React.FC = () => {
                     </div>
 
                     <StepIndicators current={step} total={3} />
+
+                    {error && <p style={{ color: 'red', fontSize: '13px', marginBottom: '12px' }}>{error}</p>}
 
                     {/* ── Step 1: Account details ── */}
                     {step === 1 && (
@@ -264,8 +320,10 @@ const SignUpPage: React.FC = () => {
                                 </div>
                             </div>
 
-                            <button type="button" className="btn-primary" onClick={handleFinalSubmit}>
-                                Go to my shelf <i className="ti ti-arrow-right" aria-hidden="true" />
+                            <button type="button" className="btn-primary"
+                                    onClick={handleFinalSubmit} disabled={loading}>
+                                {loading ? 'Creating account...' : 'Go to my shelf'}
+                                {!loading && <i className="ti ti-arrow-right" aria-hidden="true" />}
                             </button>
 
                             <p className="terms-text">

@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthLeftPanel, { ShelfdLogoInk } from '../components/AuthLeftPanel';
+import authService from '../services/authService';
 import './auth.css';
-
-// ── Static data ───────────────────────────────────────────────────────────────
 
 const SPINE_BOOKS = [
     { height: 110, color: '#8B2E12', title: 'Dune' },
@@ -17,8 +16,6 @@ const SPINE_BOOKS = [
     { height: 130, color: '#276749', title: 'Spirited Away' },
     { height: 115, color: '#742A2A', title: 'Daredevil' },
 ];
-
-// ── OAuth icon components ─────────────────────────────────────────────────────
 
 const GoogleIcon: React.FC = () => (
     <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
@@ -35,26 +32,34 @@ const GitHubIcon: React.FC = () => (
     </svg>
 );
 
-// ── Component ─────────────────────────────────────────────────────────────────
-
 const LoginPage: React.FC = () => {
     const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({ email: '', password: '' });
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // TODO: POST /api/auth/login
-        console.log('Login payload:', formData);
+        setError('');
+        setLoading(true);
+        try {
+            const data = await authService.login(formData);
+            authService.saveSession(data);
+            navigate('/dashboard');
+        } catch (err: any) {
+            setError('Invalid email or password. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
         <div className="auth-layout">
-
             <AuthLeftPanel
                 tagline={"Your digital shelf for books,\ncomics, movies & TV."}
                 quote="A reader lives a thousand lives before he dies."
@@ -64,7 +69,6 @@ const LoginPage: React.FC = () => {
 
             <main className="auth-right">
                 <div className="auth-right-inner">
-
                     <div className="auth-right-logo">
                         <ShelfdLogoInk />
                         <span className="auth-right-logo__name">Shelfd</span>
@@ -74,48 +78,31 @@ const LoginPage: React.FC = () => {
                         <h1 className="form-title">Welcome back</h1>
                         <p className="form-subtitle">
                             Don't have an account?{' '}
-                            <a onClick={() => navigate('/signup')} role="button" tabIndex={0}>
-                                Sign up free
-                            </a>
+                            <a onClick={() => navigate('/signup')} role="button" tabIndex={0}>Sign up free</a>
                         </p>
                     </div>
+
+                    {error && <p style={{ color: 'red', fontSize: '13px', marginBottom: '12px' }}>{error}</p>}
 
                     <form onSubmit={handleSubmit} noValidate>
                         <div className="form-group">
                             <label htmlFor="email" className="form-label">Email</label>
-                            <input
-                                id="email"
-                                name="email"
-                                type="email"
-                                className="form-input"
-                                placeholder="you@example.com"
-                                value={formData.email}
-                                onChange={handleChange}
-                                autoComplete="email"
-                                required
-                            />
+                            <input id="email" name="email" type="email" className="form-input"
+                                placeholder="you@example.com" value={formData.email}
+                                onChange={handleChange} autoComplete="email" required />
                         </div>
 
                         <div className="form-group">
                             <label htmlFor="password" className="form-label">Password</label>
                             <div className="password-wrapper">
-                                <input
-                                    id="password"
-                                    name="password"
+                                <input id="password" name="password"
                                     type={showPassword ? 'text' : 'password'}
                                     className="form-input password-input"
-                                    placeholder="••••••••"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    autoComplete="current-password"
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    className="password-toggle"
+                                    placeholder="••••••••" value={formData.password}
+                                    onChange={handleChange} autoComplete="current-password" required />
+                                <button type="button" className="password-toggle"
                                     onClick={() => setShowPassword(v => !v)}
-                                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                                >
+                                    aria-label={showPassword ? 'Hide password' : 'Show password'}>
                                     <i className={showPassword ? 'ti ti-eye-off' : 'ti ti-eye'} />
                                 </button>
                             </div>
@@ -125,7 +112,9 @@ const LoginPage: React.FC = () => {
                             <a href="/forgot-password">Forgot your password?</a>
                         </div>
 
-                        <button type="submit" className="btn-primary">Log in</button>
+                        <button type="submit" className="btn-primary" disabled={loading}>
+                            {loading ? 'Logging in...' : 'Log in'}
+                        </button>
                     </form>
 
                     <div className="auth-divider">
@@ -135,16 +124,9 @@ const LoginPage: React.FC = () => {
                     </div>
 
                     <div className="oauth-grid">
-                        <button type="button" className="btn-oauth">
-                            <GoogleIcon />
-                            Google
-                        </button>
-                        <button type="button" className="btn-oauth">
-                            <GitHubIcon />
-                            GitHub
-                        </button>
+                        <button type="button" className="btn-oauth"><GoogleIcon />Google</button>
+                        <button type="button" className="btn-oauth"><GitHubIcon />GitHub</button>
                     </div>
-
                 </div>
             </main>
         </div>
