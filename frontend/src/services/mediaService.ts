@@ -24,8 +24,14 @@ export interface MediaItemResponse {
     type: MediaType;
     status: MediaStatus;
     rating?: number;
+    ratingAverage?: number;
+    ratingCount?: number;
     shelfId: number;
     createdAt: string;
+}
+
+export interface RatingRequest {
+    rating: number;
 }
 
 const mediaService = {
@@ -46,6 +52,11 @@ const mediaService = {
 
     deleteMediaItem: async (shelfId: number, itemId: number): Promise<void> => {
         await api.delete(`/shelves/${shelfId}/media/${itemId}`);
+    },
+
+    rateMediaItem: async (shelfId: number, itemId: number, rating: number): Promise<MediaItemResponse> => {
+        const response = await api.post<MediaItemResponse>(`/shelves/${shelfId}/media/${itemId}/ratings`, { rating });
+        return response.data;
     },
 };
 

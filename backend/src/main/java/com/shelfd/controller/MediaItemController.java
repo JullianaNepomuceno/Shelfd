@@ -2,6 +2,7 @@ package com.shelfd.controller;
 
 import com.shelfd.dto.MediaItemRequest;
 import com.shelfd.dto.MediaItemResponse;
+import com.shelfd.dto.RatingRequest;
 import com.shelfd.entity.User;
 import com.shelfd.service.MediaItemService;
 import jakarta.validation.Valid;
@@ -52,5 +53,14 @@ public class MediaItemController {
             @AuthenticationPrincipal User currentUser) {
         mediaItemService.deleteMediaItem(itemId, currentUser);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{itemId}/ratings")
+    public ResponseEntity<MediaItemResponse> rateMediaItem(
+            @PathVariable Long shelfId,
+            @PathVariable Long itemId,
+            @Valid @RequestBody RatingRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(mediaItemService.rateMediaItem(shelfId, itemId, request.getRating(), currentUser));
     }
 }

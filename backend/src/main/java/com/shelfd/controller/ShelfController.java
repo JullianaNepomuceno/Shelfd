@@ -1,5 +1,6 @@
 package com.shelfd.controller;
 
+import com.shelfd.dto.RatingRequest;
 import com.shelfd.dto.ShelfRequest;
 import com.shelfd.dto.ShelfResponse;
 import com.shelfd.entity.User;
@@ -60,5 +61,13 @@ public class ShelfController {
             @AuthenticationPrincipal User currentUser) {
         shelfService.deleteShelf(id, currentUser);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/ratings")
+    public ResponseEntity<ShelfResponse> rateShelf(
+            @PathVariable Long id,
+            @Valid @RequestBody RatingRequest request,
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(shelfService.rateShelf(id, request.getRating(), currentUser));
     }
 }

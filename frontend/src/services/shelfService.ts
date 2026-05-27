@@ -12,6 +12,8 @@ export interface ShelfResponse {
     description: string;
     isPublic: boolean;
     ownerUsername: string;
+    ratingAverage?: number;
+    ratingCount?: number;
     createdAt: string;
 }
 
@@ -43,6 +45,11 @@ const shelfService = {
 
     deleteShelf: async (id: number): Promise<void> => {
         await api.delete(`/shelves/${id}`);
+    },
+
+    rateShelf: async (id: number, rating: number): Promise<ShelfResponse> => {
+        const response = await api.post<ShelfResponse>(`/shelves/${id}/ratings`, { rating });
+        return response.data;
     },
 };
 
