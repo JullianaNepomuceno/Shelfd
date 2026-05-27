@@ -193,7 +193,12 @@ const DashboardPage: React.FC = () => {
                                             onChange={e => setEditShelfName(e.target.value)}
                                         />
                                     ) : (
-                                        <h2 className="shelf-card__name">{shelf.name}</h2>
+                                        <div className="shelf-card__title">
+                                            <h2 className="shelf-card__name">{shelf.name}</h2>
+                                            <span className={`shelf-visibility-badge ${shelf.isPublic ? 'shelf-visibility-badge--public' : 'shelf-visibility-badge--private'}`}>
+                                                {shelf.isPublic ? 'Public' : 'Private'}
+                                            </span>
+                                        </div>
                                     )}
                                     <div className="shelf-card__actions">
                                         {!isEditing && (
@@ -244,7 +249,7 @@ const DashboardPage: React.FC = () => {
                                             <p className="shelf-card__desc">{shelf.description}</p>
                                         )}
                                         <span className="shelf-card__visibility">
-                                            {shelf.isPublic ? '🌐 Public' : '🔒 Private'}
+                                            {shelf.isPublic ? 'Public shelf' : 'Private shelf'}
                                         </span>
                                     </>
                                 )}

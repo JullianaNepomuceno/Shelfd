@@ -88,7 +88,7 @@ public class ShelfService {
                 shelf.getName(),
                 shelf.getDescription(),
                 shelf.isPublic(),
-                shelf.getOwner().getUsername(),
+            shelf.getOwner().getDisplayUsername(),
                 shelf.getCreatedAt()
         );
     }
