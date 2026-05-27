@@ -20,6 +20,12 @@ public class MediaItem {
     @Column(name = "media_link")
     private String mediaLink;
 
+    @Column(name = "cover_url")
+    private String coverUrl;
+
+    @Column(name = "comment_text", length = 1000)
+    private String comment;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private MediaType type;
@@ -51,6 +57,8 @@ public class MediaItem {
     public String getTitle() { return title; }
     public String getCreator() { return creator; }
     public String getMediaLink() { return mediaLink; }
+    public String getCoverUrl() { return coverUrl; }
+    public String getComment() { return comment; }
     public MediaType getType() { return type; }
     public MediaStatus getStatus() { return status; }
     public Integer getRating() { return rating; }
@@ -62,6 +70,8 @@ public class MediaItem {
     public void setTitle(String title) { this.title = title; }
     public void setCreator(String creator) { this.creator = creator; }
     public void setMediaLink(String mediaLink) { this.mediaLink = mediaLink; }
+    public void setCoverUrl(String coverUrl) { this.coverUrl = coverUrl; }
+    public void setComment(String comment) { this.comment = comment; }
     public void setType(MediaType type) { this.type = type; }
     public void setStatus(MediaStatus status) { this.status = status; }
     public void setRating(Integer rating) { this.rating = rating; }

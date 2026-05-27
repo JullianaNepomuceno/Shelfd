@@ -1,0 +1,152 @@
+/* ── Public shelves page ─────────────────────────────────────────────────── */
+
+.public-shelves {
+    min-height: 100vh;
+    background: var(--surface, #FAF8F5);
+    display: flex;
+    flex-direction: column;
+}
+
+.public-shelves__nav {
+    height: 56px;
+    background: var(--ink, #1A1610);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+}
+
+.public-shelves__nav-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.public-shelves__user {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.btn-back {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    padding: 6px 12px;
+    transition: background 0.2s;
+}
+
+.btn-back:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.btn-logout {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 6px;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-logout:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+.public-shelves__main {
+    max-width: 980px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 36px 24px 60px;
+}
+
+.public-shelves__header h1 {
+    font-family: var(--font-display, serif);
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--ink, #1A1610);
+}
+
+.public-shelves__header p {
+    margin-top: 6px;
+    font-size: 14px;
+    color: var(--muted, #7A6E62);
+}
+
+.public-shelves__error {
+    color: #e53e3e;
+    font-size: 13px;
+    margin-top: 16px;
+}
+
+.public-shelves__loading {
+    color: var(--muted, #7A6E62);
+    font-size: 14px;
+    text-align: center;
+    padding: 40px 0;
+}
+
+.public-shelves__empty {
+    text-align: center;
+    padding: 60px 0;
+    color: var(--muted, #7A6E62);
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.public-shelves__grid {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 16px;
+}
+
+.public-shelf-card {
+    background: #fff;
+    border: 1px solid var(--border, #E8E3DC);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.public-shelf-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.public-shelf-card__header h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink, #1A1610);
+}
+
+.public-shelf-card__open {
+    font-size: 12px;
+    border: 1px solid var(--border, #E8E3DC);
+    border-radius: 6px;
+    padding: 4px 10px;
+    background: none;
+    color: var(--ink, #1A1610);
+}
+
+.public-shelf-card__open:hover {
+    border-color: rgba(26, 22, 16, 0.3);
+}
+
+.public-shelf-card__desc {
+    font-size: 13px;
+    color: var(--muted, #7A6E62);
+}
+
+.public-shelf-card__owner {
+    font-size: 12px;
+    color: var(--muted, #7A6E62);
+}

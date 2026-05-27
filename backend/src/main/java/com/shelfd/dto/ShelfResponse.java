@@ -1,5 +1,7 @@
 package com.shelfd.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDateTime;
 
 public class ShelfResponse {
@@ -7,6 +9,7 @@ public class ShelfResponse {
     private Long id;
     private String name;
     private String description;
+    @JsonProperty("isPublic")
     private boolean isPublic;
     private String ownerUsername;
     private LocalDateTime createdAt;
@@ -24,6 +27,7 @@ public class ShelfResponse {
     public Long getId() { return id; }
     public String getName() { return name; }
     public String getDescription() { return description; }
+    @JsonProperty("isPublic")
     public boolean isPublic() { return isPublic; }
     public String getOwnerUsername() { return ownerUsername; }
     public LocalDateTime getCreatedAt() { return createdAt; }

@@ -73,6 +73,11 @@
     margin-bottom: 28px;
 }
 
+.dashboard-header__actions {
+    display: flex;
+    gap: 10px;
+}
+
 .dashboard-title {
     font-family: var(--font-display, serif);
     font-size: 26px;
@@ -96,6 +101,22 @@
 
 .btn-new-shelf:hover {
     background: #333;
+}
+
+.btn-secondary {
+    height: 38px;
+    padding: 0 18px;
+    background: none;
+    color: var(--ink, #1A1610);
+    border: 1px solid var(--border, #E8E3DC);
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.btn-secondary:hover {
+    border-color: rgba(26, 22, 16, 0.35);
 }
 
 /* ── New shelf form ───────────────────────────────────────────────────────── */
@@ -130,6 +151,22 @@
 .new-shelf-form__actions {
     display: flex;
     gap: 10px;
+}
+
+.shelf-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--muted, #888);
+}
+
+.shelf-toggle input {
+    accent-color: var(--spine, #C4532A);
+}
+
+.shelf-toggle--compact {
+    font-size: 12px;
 }
 
 .btn-create {
@@ -191,11 +228,60 @@
     margin-bottom: 8px;
 }
 
+.shelf-card__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.shelf-card__actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.shelf-card__edit {
+    background: none;
+    border: 1px solid var(--border, #E8E3DC);
+    color: var(--ink, #1A1610);
+    font-size: 12px;
+    border-radius: 6px;
+    padding: 3px 8px;
+    cursor: pointer;
+}
+
+.shelf-card__edit:hover {
+    border-color: rgba(26, 22, 16, 0.35);
+}
+
 .shelf-card__name {
     font-size: 16px;
     font-weight: 600;
     color: var(--ink, #1A1610);
     font-family: var(--font-display, serif);
+}
+
+.shelf-visibility-badge {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--border, #E8E3DC);
+    color: var(--muted, #888);
+}
+
+.shelf-visibility-badge--public {
+    color: #256f4a;
+    border-color: rgba(37, 111, 74, 0.35);
+    background: rgba(37, 111, 74, 0.08);
+}
+
+.shelf-visibility-badge--private {
+    color: #6b4b18;
+    border-color: rgba(107, 75, 24, 0.35);
+    background: rgba(107, 75, 24, 0.08);
 }
 
 .shelf-card__delete {
@@ -211,6 +297,21 @@
 }
 
 .shelf-card__delete:hover { color: #e53e3e; }
+
+.shelf-card__edit-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.shelf-input--edit {
+    height: 36px;
+}
+
+.shelf-card__edit-actions {
+    display: flex;
+    gap: 10px;
+}
 
 .shelf-card__desc {
     font-size: 13px;
