@@ -61,10 +61,15 @@ const ShelfPage: React.FC = () => {
     const [editForm, setEditForm] = useState<MediaFormState>(emptyForm);
     const [updating, setUpdating] = useState(false);
     const [copyStatus, setCopyStatus] = useState('');
+    const [shelfRatingInput, setShelfRatingInput] = useState('');
+    const [mediaRatingInputs, setMediaRatingInputs] = useState<Record<number, string>>({});
+    const [ratingNotice, setRatingNotice] = useState('');
 
     const isOwner = shelf?.ownerUsername && user?.username
         ? shelf.ownerUsername === user.username
         : false;
+
+    const canRate = shelf ? shelf.isPublic || isOwner : false;
 
     useEffect(() => {
         if (!Number.isFinite(parsedShelfId)) {
@@ -213,6 +218,44 @@ const ShelfPage: React.FC = () => {
         setEditingItem(null);
     };
 
+    const handleRateShelf = async () => {
+        if (!shelf || !canRate) return;
+        const ratingValue = parseRating(shelfRatingInput);
+        if (ratingValue === undefined) {
+            setError('Rating must be a number between 1 and 10.');
+            return;
+        }
+        setError('');
+        try {
+            const updated = await shelfService.rateShelf(shelf.id, ratingValue);
+            setShelf(updated);
+            setShelfRatingInput('');
+            setRatingNotice('Thanks for rating!');
+        } catch (err) {
+            setError('Failed to save shelf rating.');
+        } finally {
+            window.setTimeout(() => setRatingNotice(''), 2000);
+        }
+    };
+
+    const handleRateMediaItem = async (itemId: number) => {
+        if (!canRate) return;
+        const input = mediaRatingInputs[itemId] || '';
+        const ratingValue = parseRating(input);
+        if (ratingValue === undefined) {
+            setError('Rating must be a number between 1 and 10.');
+            return;
+        }
+        setError('');
+        try {
+            const updated = await mediaService.rateMediaItem(parsedShelfId, itemId, ratingValue);
+            setItems(prev => prev.map(item => (item.id === itemId ? updated : item)));
+            setMediaRatingInputs(prev => ({ ...prev, [itemId]: '' }));
+        } catch (err) {
+            setError('Failed to save media rating.');
+        }
+    };
+
     const handleCopyLink = async () => {
         if (!shelf || !shelf.isPublic) return;
         const url = `${window.location.origin}/shelf/${shelf.id}`;
@@ -247,6 +290,17 @@ const ShelfPage: React.FC = () => {
                         {shelf && (
                             <p className="shelf-owner">Owner: {shelf.ownerUsername}</p>
                         )}
+                        {shelf && (
+                            <div className="rating-summary">
+                                {shelf.ratingCount ? (
+                                    <span>
+                                        Community rating: {shelf.ratingAverage?.toFixed(1)} ({shelf.ratingCount} ratings)
+                                    </span>
+                                ) : (
+                                    <span>No community ratings yet.</span>
+                                )}
+                            </div>
+                        )}
                     </div>
                     <div className="shelf-header__actions">
                         {shelf?.isPublic && (
@@ -255,6 +309,23 @@ const ShelfPage: React.FC = () => {
                                     Copy link
                                 </button>
                                 {copyStatus && <span className="copy-link__status">{copyStatus}</span>}
+                            </div>
+                        )}
+                        {shelf && canRate && (
+                            <div className="rating-control">
+                                <input
+                                    className="rating-input"
+                                    type="number"
+                                    min={1}
+                                    max={10}
+                                    value={shelfRatingInput}
+                                    onChange={e => setShelfRatingInput(e.target.value)}
+                                    placeholder="Rate 1-10"
+                                />
+                                <button className="btn-secondary" onClick={handleRateShelf}>
+                                    Rate shelf
+                                </button>
+                                {ratingNotice && <span className="copy-link__status">{ratingNotice}</span>}
                             </div>
                         )}
                         {isOwner && (
@@ -403,6 +474,36 @@ const ShelfPage: React.FC = () => {
                                         <span>-</span>
                                         <span>{item.status.replace('_', ' ')}</span>
                                     </div>
+                                    <div className="media-card__ratings">
+                                        {item.ratingCount ? (
+                                            <span>
+                                                Community rating: {item.ratingAverage?.toFixed(1)} ({item.ratingCount})
+                                            </span>
+                                        ) : (
+                                            <span>No community ratings yet.</span>
+                                        )}
+                                    </div>
+                                    {canRate && (
+                                        <div className="media-card__rate">
+                                            <input
+                                                className="rating-input rating-input--compact"
+                                                type="number"
+                                                min={1}
+                                                max={10}
+                                                value={mediaRatingInputs[item.id] || ''}
+                                                onChange={e => setMediaRatingInputs(prev => ({
+                                                    ...prev,
+                                                    [item.id]: e.target.value,
+                                                }))}
+                                                placeholder="1-10"
+                                            />
+                                            <button
+                                                className="btn-secondary"
+                                                onClick={() => handleRateMediaItem(item.id)}>
+                                                Rate
+                                            </button>
+                                        </div>
+                                    )}
                                     {item.comment && <p className="media-card__comment">{item.comment}</p>}
                                     {item.mediaLink && (
                                         <a className="media-card__link" href={item.mediaLink} target="_blank" rel="noreferrer">

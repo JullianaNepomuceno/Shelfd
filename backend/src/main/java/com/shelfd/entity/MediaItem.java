@@ -37,6 +37,12 @@ public class MediaItem {
     @Column(nullable = true)
     private Integer rating;
 
+    @Column(name = "rating_average")
+    private Double ratingAverage;
+
+    @Column(name = "rating_count")
+    private Integer ratingCount;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shelf_id", nullable = false)
     private Shelf shelf;
@@ -62,6 +68,8 @@ public class MediaItem {
     public MediaType getType() { return type; }
     public MediaStatus getStatus() { return status; }
     public Integer getRating() { return rating; }
+    public Double getRatingAverage() { return ratingAverage; }
+    public Integer getRatingCount() { return ratingCount; }
     public Shelf getShelf() { return shelf; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 
@@ -75,5 +83,7 @@ public class MediaItem {
     public void setType(MediaType type) { this.type = type; }
     public void setStatus(MediaStatus status) { this.status = status; }
     public void setRating(Integer rating) { this.rating = rating; }
+    public void setRatingAverage(Double ratingAverage) { this.ratingAverage = ratingAverage; }
+    public void setRatingCount(Integer ratingCount) { this.ratingCount = ratingCount; }
     public void setShelf(Shelf shelf) { this.shelf = shelf; }
 }
