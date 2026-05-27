@@ -21,6 +21,16 @@ const shelfService = {
         return response.data;
     },
 
+    getPublicShelves: async (): Promise<ShelfResponse[]> => {
+        const response = await api.get<ShelfResponse[]>('/shelves/public');
+        return response.data;
+    },
+
+    getShelfById: async (id: number): Promise<ShelfResponse> => {
+        const response = await api.get<ShelfResponse>(`/shelves/${id}`);
+        return response.data;
+    },
+
     createShelf: async (payload: ShelfRequest): Promise<ShelfResponse> => {
         const response = await api.post<ShelfResponse>('/shelves', payload);
         return response.data;

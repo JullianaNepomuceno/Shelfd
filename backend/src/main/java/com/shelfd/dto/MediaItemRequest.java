@@ -16,6 +16,11 @@ public class MediaItemRequest {
 
     private String mediaLink;
 
+    private String coverUrl;
+
+    @jakarta.validation.constraints.Size(max = 1000, message = "Comment must be 1000 characters or less")
+    private String comment;
+
     @NotNull(message = "Media type is required")
     private MediaType type;
 
@@ -29,6 +34,8 @@ public class MediaItemRequest {
     public String getTitle() { return title; }
     public String getCreator() { return creator; }
     public String getMediaLink() { return mediaLink; }
+    public String getCoverUrl() { return coverUrl; }
+    public String getComment() { return comment; }
     public MediaType getType() { return type; }
     public MediaStatus getStatus() { return status; }
     public Integer getRating() { return rating; }

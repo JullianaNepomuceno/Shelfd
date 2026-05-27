@@ -10,4 +10,6 @@ import java.util.List;
 public interface ShelfRepository extends JpaRepository<Shelf, Long> {
 
     List<Shelf> findByOwnerId(Long ownerId);
+
+    List<Shelf> findByIsPublicTrue();
 }

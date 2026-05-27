@@ -25,7 +25,14 @@ const DashboardPage: React.FC = () => {
     const [showForm, setShowForm] = useState(false);
     const [newShelfName, setNewShelfName] = useState('');
     const [newShelfDesc, setNewShelfDesc] = useState('');
+    const [newShelfPublic, setNewShelfPublic] = useState(false);
     const [creating, setCreating] = useState(false);
+
+    const [editingShelfId, setEditingShelfId] = useState<number | null>(null);
+    const [editShelfName, setEditShelfName] = useState('');
+    const [editShelfDesc, setEditShelfDesc] = useState('');
+    const [editShelfPublic, setEditShelfPublic] = useState(false);
+    const [savingEditId, setSavingEditId] = useState<number | null>(null);
 
     useEffect(() => {
         fetchShelves();
@@ -49,16 +56,49 @@ const DashboardPage: React.FC = () => {
             const created = await shelfService.createShelf({
                 name: newShelfName,
                 description: newShelfDesc,
-                isPublic: false,
+                isPublic: newShelfPublic,
             });
             setShelves(prev => [...prev, created]);
             setNewShelfName('');
             setNewShelfDesc('');
+            setNewShelfPublic(false);
             setShowForm(false);
         } catch (err) {
             setError('Failed to create shelf.');
         } finally {
             setCreating(false);
+        }
+    };
+
+    const startEditShelf = (shelf: ShelfResponse) => {
+        setEditingShelfId(shelf.id);
+        setEditShelfName(shelf.name);
+        setEditShelfDesc(shelf.description || '');
+        setEditShelfPublic(shelf.isPublic);
+    };
+
+    const cancelEditShelf = () => {
+        setEditingShelfId(null);
+        setEditShelfName('');
+        setEditShelfDesc('');
+        setEditShelfPublic(false);
+    };
+
+    const handleUpdateShelf = async (id: number) => {
+        if (!editShelfName.trim()) return;
+        setSavingEditId(id);
+        try {
+            const updated = await shelfService.updateShelf(id, {
+                name: editShelfName,
+                description: editShelfDesc,
+                isPublic: editShelfPublic,
+            });
+            setShelves(prev => prev.map(shelf => (shelf.id === id ? updated : shelf)));
+            cancelEditShelf();
+        } catch (err) {
+            setError('Failed to update shelf.');
+        } finally {
+            setSavingEditId(null);
         }
     };
 
@@ -95,9 +135,14 @@ const DashboardPage: React.FC = () => {
             <main className="dashboard-main">
                 <div className="dashboard-header">
                     <h1 className="dashboard-title">My Shelves</h1>
-                    <button className="btn-new-shelf" onClick={() => setShowForm(v => !v)}>
-                        + New Shelf
-                    </button>
+                    <div className="dashboard-header__actions">
+                        <button className="btn-secondary" onClick={() => navigate('/public-shelves')}>
+                            Public Shelves
+                        </button>
+                        <button className="btn-new-shelf" onClick={() => setShowForm(v => !v)}>
+                            + New Shelf
+                        </button>
+                    </div>
                 </div>
 
                 {error && <p className="dashboard-error">{error}</p>}
@@ -108,6 +153,14 @@ const DashboardPage: React.FC = () => {
                             value={newShelfName} onChange={e => setNewShelfName(e.target.value)} />
                         <input className="shelf-input" placeholder="Description (optional)"
                             value={newShelfDesc} onChange={e => setNewShelfDesc(e.target.value)} />
+                        <label className="shelf-toggle">
+                            <input
+                                type="checkbox"
+                                checked={newShelfPublic}
+                                onChange={e => setNewShelfPublic(e.target.checked)}
+                            />
+                            <span>Make this shelf public</span>
+                        </label>
                         <div className="new-shelf-form__actions">
                             <button className="btn-create" onClick={handleCreateShelf} disabled={creating}>
                                 {creating ? 'Creating...' : 'Create'}
@@ -127,21 +180,77 @@ const DashboardPage: React.FC = () => {
                 ) : (
                     <div className="shelves-grid">
                         {shelves.map(shelf => (
+                            (() => {
+                                const isEditing = editingShelfId === shelf.id;
+                                return (
                             <div key={shelf.id} className="shelf-card"
-                                onClick={() => navigate(`/shelf/${shelf.id}`)}>
+                                onClick={() => { if (!isEditing) navigate(`/shelf/${shelf.id}`); }}>
                                 <div className="shelf-card__header">
-                                    <h2 className="shelf-card__name">{shelf.name}</h2>
-                                    <button className="shelf-card__delete"
-                                        onClick={e => { e.stopPropagation(); handleDeleteShelf(shelf.id); }}
-                                        aria-label="Delete shelf">✕</button>
+                                    {isEditing ? (
+                                        <input
+                                            className="shelf-input shelf-input--edit"
+                                            value={editShelfName}
+                                            onChange={e => setEditShelfName(e.target.value)}
+                                        />
+                                    ) : (
+                                        <h2 className="shelf-card__name">{shelf.name}</h2>
+                                    )}
+                                    <div className="shelf-card__actions">
+                                        {!isEditing && (
+                                            <button
+                                                className="shelf-card__edit"
+                                                onClick={e => { e.stopPropagation(); startEditShelf(shelf); }}>
+                                                Edit
+                                            </button>
+                                        )}
+                                        <button className="shelf-card__delete"
+                                            onClick={e => { e.stopPropagation(); handleDeleteShelf(shelf.id); }}
+                                            aria-label="Delete shelf">x</button>
+                                    </div>
                                 </div>
-                                {shelf.description && (
-                                    <p className="shelf-card__desc">{shelf.description}</p>
+                                {isEditing ? (
+                                    <div className="shelf-card__edit-body">
+                                        <input
+                                            className="shelf-input shelf-input--edit"
+                                            placeholder="Description (optional)"
+                                            value={editShelfDesc}
+                                            onChange={e => setEditShelfDesc(e.target.value)}
+                                        />
+                                        <label className="shelf-toggle shelf-toggle--compact">
+                                            <input
+                                                type="checkbox"
+                                                checked={editShelfPublic}
+                                                onChange={e => setEditShelfPublic(e.target.checked)}
+                                            />
+                                            <span>Public shelf</span>
+                                        </label>
+                                        <div className="shelf-card__edit-actions">
+                                            <button
+                                                className="btn-create"
+                                                onClick={e => { e.stopPropagation(); handleUpdateShelf(shelf.id); }}
+                                                disabled={savingEditId === shelf.id}>
+                                                {savingEditId === shelf.id ? 'Saving...' : 'Save'}
+                                            </button>
+                                            <button
+                                                className="btn-cancel"
+                                                onClick={e => { e.stopPropagation(); cancelEditShelf(); }}>
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <>
+                                        {shelf.description && (
+                                            <p className="shelf-card__desc">{shelf.description}</p>
+                                        )}
+                                        <span className="shelf-card__visibility">
+                                            {shelf.isPublic ? '🌐 Public' : '🔒 Private'}
+                                        </span>
+                                    </>
                                 )}
-                                <span className="shelf-card__visibility">
-                                    {shelf.isPublic ? '🌐 Public' : '🔒 Private'}
-                                </span>
                             </div>
+                                );
+                            })()
                         ))}
                     </div>
                 )}

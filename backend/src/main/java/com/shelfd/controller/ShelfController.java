@@ -34,6 +34,18 @@ public class ShelfController {
         return ResponseEntity.ok(shelfService.getShelvesForUser(currentUser));
     }
 
+    @GetMapping("/public")
+    public ResponseEntity<List<ShelfResponse>> getPublicShelves() {
+        return ResponseEntity.ok(shelfService.getPublicShelves());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ShelfResponse> getShelfById(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User currentUser) {
+        return ResponseEntity.ok(shelfService.getShelfById(id, currentUser));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<ShelfResponse> updateShelf(
             @PathVariable Long id,

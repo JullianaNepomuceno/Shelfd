@@ -3,6 +3,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
 import DashboardPage from './pages/DashboardPage';
+import PublicShelvesPage from './pages/PublicShelvesPage';
+import ShelfPage from './pages/ShelfPage';
 import authService from './services/authService';
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -18,6 +20,16 @@ const App: React.FC = () => {
                 <Route path="/dashboard" element={
                     <PrivateRoute>
                         <DashboardPage />
+                    </PrivateRoute>
+                } />
+                <Route path="/public-shelves" element={
+                    <PrivateRoute>
+                        <PublicShelvesPage />
+                    </PrivateRoute>
+                } />
+                <Route path="/shelf/:shelfId" element={
+                    <PrivateRoute>
+                        <ShelfPage />
                     </PrivateRoute>
                 } />
                 <Route path="/" element={<Navigate to="/login" />} />

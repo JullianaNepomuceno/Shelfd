@@ -36,6 +36,8 @@ public class MediaItemService {
         item.setTitle(request.getTitle());
         item.setCreator(request.getCreator());
         item.setMediaLink(request.getMediaLink());
+        item.setCoverUrl(request.getCoverUrl());
+        item.setComment(request.getComment());
         item.setType(request.getType());
         item.setStatus(request.getStatus());
         item.setRating(request.getRating());
@@ -69,6 +71,8 @@ public class MediaItemService {
         item.setTitle(request.getTitle());
         item.setCreator(request.getCreator());
         item.setMediaLink(request.getMediaLink());
+        item.setCoverUrl(request.getCoverUrl());
+        item.setComment(request.getComment());
         item.setType(request.getType());
         item.setStatus(request.getStatus());
         item.setRating(request.getRating());
@@ -93,6 +97,8 @@ public class MediaItemService {
                 item.getTitle(),
                 item.getCreator(),
                 item.getMediaLink(),
+                item.getCoverUrl(),
+                item.getComment(),
                 item.getType(),
                 item.getStatus(),
                 item.getRating(),

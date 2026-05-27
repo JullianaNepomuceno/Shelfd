@@ -7,6 +7,8 @@ export interface MediaItemRequest {
     title: string;
     creator: string;
     mediaLink?: string;
+    coverUrl?: string;
+    comment?: string;
     type: MediaType;
     status: MediaStatus;
     rating?: number;
@@ -17,6 +19,8 @@ export interface MediaItemResponse {
     title: string;
     creator: string;
     mediaLink?: string;
+    coverUrl?: string;
+    comment?: string;
     type: MediaType;
     status: MediaStatus;
     rating?: number;

@@ -37,6 +37,25 @@ public class ShelfService {
                 .collect(Collectors.toList());
     }
 
+    public List<ShelfResponse> getPublicShelves() {
+        return shelfRepository.findByIsPublicTrue()
+                .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    public ShelfResponse getShelfById(Long shelfId, User currentUser) {
+        Shelf shelf = shelfRepository.findById(shelfId)
+                .orElseThrow(() -> new RuntimeException("Shelf not found"));
+
+        boolean isOwner = shelf.getOwner().getId().equals(currentUser.getId());
+        if (!isOwner && !shelf.isPublic()) {
+            throw new RuntimeException("Access denied");
+        }
+
+        return toResponse(shelf);
+    }
+
     public ShelfResponse updateShelf(Long shelfId, ShelfRequest request, User owner) {
         Shelf shelf = shelfRepository.findById(shelfId)
                 .orElseThrow(() -> new RuntimeException("Shelf not found"));
