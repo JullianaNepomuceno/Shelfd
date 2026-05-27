@@ -60,6 +60,7 @@ const ShelfPage: React.FC = () => {
     const [editingItem, setEditingItem] = useState<MediaItemResponse | null>(null);
     const [editForm, setEditForm] = useState<MediaFormState>(emptyForm);
     const [updating, setUpdating] = useState(false);
+    const [copyStatus, setCopyStatus] = useState('');
 
     const isOwner = shelf?.ownerUsername && user?.username
         ? shelf.ownerUsername === user.username
@@ -212,6 +213,18 @@ const ShelfPage: React.FC = () => {
         setEditingItem(null);
     };
 
+    const handleCopyLink = async () => {
+        if (!shelf || !shelf.isPublic) return;
+        const url = `${window.location.origin}/shelf/${shelf.id}`;
+        try {
+            await navigator.clipboard.writeText(url);
+            setCopyStatus('Link copied!');
+        } catch (err) {
+            setCopyStatus('Copy failed.');
+        }
+        window.setTimeout(() => setCopyStatus(''), 2000);
+    };
+
     return (
         <div className="shelf-page">
             <nav className="shelf-nav">
@@ -235,11 +248,21 @@ const ShelfPage: React.FC = () => {
                             <p className="shelf-owner">Owner: {shelf.ownerUsername}</p>
                         )}
                     </div>
-                    {isOwner && (
-                        <button className="btn-primary" onClick={() => setShowForm(v => !v)}>
-                            {showForm ? 'Close' : '+ Add Media'}
-                        </button>
-                    )}
+                    <div className="shelf-header__actions">
+                        {shelf?.isPublic && (
+                            <div className="copy-link">
+                                <button className="btn-secondary" onClick={handleCopyLink}>
+                                    Copy link
+                                </button>
+                                {copyStatus && <span className="copy-link__status">{copyStatus}</span>}
+                            </div>
+                        )}
+                        {isOwner && (
+                            <button className="btn-primary" onClick={() => setShowForm(v => !v)}>
+                                {showForm ? 'Close' : '+ Add Media'}
+                            </button>
+                        )}
+                    </div>
                 </header>
 
                 {error && <p className="shelf-error">{error}</p>}
