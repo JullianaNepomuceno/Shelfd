@@ -342,7 +342,7 @@
 
 .shelf-card__delete:hover { color: #e53e3e; background: rgba(229,62,62,0.06); }
 
-.shelf-card__delete--trash svg { display: block; }
+.shelf-card__delete--trash svg { display: block; width:18px; height:18px; }
 
 .shelf-card__delete--trash { color: #e53e3e; }
 
