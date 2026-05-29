@@ -5,6 +5,8 @@ import SignUpPage from './pages/SignUpPage';
 import DashboardPage from './pages/DashboardPage';
 import PublicShelvesPage from './pages/PublicShelvesPage';
 import ShelfPage from './pages/ShelfPage';
+import ProfilePage from './pages/ProfilePage';
+import MonthlyTopShelvesPage from './pages/MonthlyTopShelvesPage';
 import authService from './services/authService';
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -25,6 +27,16 @@ const App: React.FC = () => {
                 <Route path="/public-shelves" element={
                     <PrivateRoute>
                         <PublicShelvesPage />
+                    </PrivateRoute>
+                } />
+                <Route path="/monthly-top-shelves" element={
+                    <PrivateRoute>
+                        <MonthlyTopShelvesPage />
+                    </PrivateRoute>
+                } />
+                <Route path="/profile" element={
+                    <PrivateRoute>
+                        <ProfilePage />
                     </PrivateRoute>
                 } />
                 <Route path="/shelf/:shelfId" element={

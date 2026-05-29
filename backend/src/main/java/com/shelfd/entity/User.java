@@ -34,6 +34,9 @@ public class User implements UserDetails {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
     public User() {}
 
     @PrePersist
@@ -51,6 +54,8 @@ public class User implements UserDetails {
     public String getDisplayUsername() { return username; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 
+    public String getAvatarUrl() { return avatarUrl; }
+
     // ── Setters ───────────────────────────────────────────────────────────────
 
     public void setUsername(String username) { this.username = username; }
@@ -58,6 +63,9 @@ public class User implements UserDetails {
     public void setPassword(String password) { this.password = password; }
     public void setFirstName(String firstName) { this.firstName = firstName; }
     public void setLastName(String lastName) { this.lastName = lastName; }
+
+    public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
+
 
     // ── UserDetails ───────────────────────────────────────────────────────────
 

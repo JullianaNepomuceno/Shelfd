@@ -30,6 +30,9 @@ public class Shelf {
     @JoinColumn(name = "user_id", nullable = false)
     private User owner;
 
+    @OneToMany(mappedBy = "shelf", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<MediaItem> mediaItems = new java.util.ArrayList<>();
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

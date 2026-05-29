@@ -18,11 +18,14 @@ public class ShelfService {
 
     private final ShelfRepository shelfRepository;
     private final ShelfRatingRepository shelfRatingRepository;
+    private final com.shelfd.repository.MediaItemRepository mediaItemRepository;
 
     public ShelfService(ShelfRepository shelfRepository,
-                        ShelfRatingRepository shelfRatingRepository) {
+                        ShelfRatingRepository shelfRatingRepository,
+                        com.shelfd.repository.MediaItemRepository mediaItemRepository) {
         this.shelfRepository = shelfRepository;
         this.shelfRatingRepository = shelfRatingRepository;
+        this.mediaItemRepository = mediaItemRepository;
     }
 
     public ShelfResponse createShelf(ShelfRequest request, User owner) {
@@ -77,6 +80,7 @@ public class ShelfService {
         return toResponse(shelfRepository.save(shelf));
     }
 
+    @org.springframework.transaction.annotation.Transactional
     public void deleteShelf(Long shelfId, User owner) {
         Shelf shelf = shelfRepository.findById(shelfId)
                 .orElseThrow(() -> new RuntimeException("Shelf not found"));
@@ -84,6 +88,9 @@ public class ShelfService {
         if (!shelf.getOwner().getId().equals(owner.getId())) {
             throw new RuntimeException("You do not own this shelf");
         }
+
+        // Remove media items referencing this shelf first to avoid FK constraint errors
+        mediaItemRepository.deleteAll(mediaItemRepository.findByShelfId(shelfId));
 
         shelfRepository.delete(shelf);
     }

@@ -1,9 +1,20 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { NavLink, useNavigate, useParams } from 'react-router-dom';
 import authService from '../services/authService';
-import mediaService, { MediaItemRequest, MediaItemResponse, MediaStatus, MediaType } from '../services/mediaService';
+import mediaService, { MediaItemRequest, MediaItemResponse, SeriesStatus, UserStatus, MediaType } from '../services/mediaService';
 import shelfService, { ShelfResponse } from '../services/shelfService';
 import './shelf.css';
+import ConfirmDialog from '../components/ConfirmDialog';
+
+const ShelfdLogoWhite: React.FC = () => (
+    <svg width="24" height="24" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+        <rect x="1"  y="3"  width="4" height="16" rx="1" fill="#C4532A" />
+        <rect x="7"  y="5"  width="3" height="14" rx="1" fill="rgba(255,255,255,0.5)" />
+        <rect x="12" y="2"  width="5" height="17" rx="1" fill="rgba(255,255,255,0.3)" />
+        <rect x="19" y="6"  width="2" height="13" rx="1" fill="rgba(255,255,255,0.6)" />
+        <rect x="0"  y="18" width="22" height="2"  rx="1" fill="rgba(255,255,255,0.2)" />
+    </svg>
+);
 
 const MEDIA_TYPES: { label: string; value: MediaType }[] = [
     { label: 'Movie', value: 'MOVIE' },
@@ -13,7 +24,13 @@ const MEDIA_TYPES: { label: string; value: MediaType }[] = [
     { label: 'Game', value: 'GAME' },
 ];
 
-const MEDIA_STATUSES: { label: string; value: MediaStatus }[] = [
+const SERIES_STATUSES: { label: string; value: SeriesStatus }[] = [
+    { label: 'Finished', value: 'FINISHED' },
+    { label: 'Unfinished', value: 'UNFINISHED' },
+    { label: 'In-Progress', value: 'IN_PROGRESS' },
+];
+
+const USER_STATUSES: { label: string; value: UserStatus }[] = [
     { label: 'Finished', value: 'FINISHED' },
     { label: 'Unfinished', value: 'UNFINISHED' },
     { label: 'In-Progress', value: 'IN_PROGRESS' },
@@ -24,10 +41,12 @@ interface MediaFormState {
     creator: string;
     coverUrl: string;
     mediaLink: string;
-    rating: string;
+    rating: number | null;
     comment: string;
     type: MediaType;
-    status: MediaStatus;
+    seriesStatus: SeriesStatus;
+    userStatus: UserStatus;
+    genres: string;
 }
 
 const emptyForm: MediaFormState = {
@@ -35,10 +54,12 @@ const emptyForm: MediaFormState = {
     creator: '',
     coverUrl: '',
     mediaLink: '',
-    rating: '',
+    rating: null,
     comment: '',
     type: 'MOVIE',
-    status: 'UNFINISHED',
+    seriesStatus: 'UNFINISHED',
+    userStatus: 'UNFINISHED',
+    genres: '',
 };
 
 const ShelfPage: React.FC = () => {
@@ -56,13 +77,17 @@ const ShelfPage: React.FC = () => {
     const [showForm, setShowForm] = useState(false);
     const [saving, setSaving] = useState(false);
     const [form, setForm] = useState<MediaFormState>(emptyForm);
+    const [formCoverFile, setFormCoverFile] = useState<File | null>(null);
+    const [formCoverPreview, setFormCoverPreview] = useState('');
 
     const [editingItem, setEditingItem] = useState<MediaItemResponse | null>(null);
     const [editForm, setEditForm] = useState<MediaFormState>(emptyForm);
     const [updating, setUpdating] = useState(false);
+    const [editCoverFile, setEditCoverFile] = useState<File | null>(null);
+    const [editCoverPreview, setEditCoverPreview] = useState('');
     const [copyStatus, setCopyStatus] = useState('');
-    const [shelfRatingInput, setShelfRatingInput] = useState('');
-    const [mediaRatingInputs, setMediaRatingInputs] = useState<Record<number, string>>({});
+    const [shelfRatingInput, setShelfRatingInput] = useState<number | null>(null);
+    const [mediaRatingInputs, setMediaRatingInputs] = useState<Record<number, number>>({});
     const [ratingNotice, setRatingNotice] = useState('');
 
     const isOwner = shelf?.ownerUsername && user?.username
@@ -70,6 +95,64 @@ const ShelfPage: React.FC = () => {
         : false;
 
     const canRate = shelf ? shelf.isPublic || isOwner : false;
+
+    const buildStarDisplay = (average?: number) => {
+        if (average === undefined || average === null) return '';
+        const clamped = Math.max(0, Math.min(5, Math.round(average / 2)));
+        const filled = '★★★★★'.slice(0, clamped);
+        const empty = '☆☆☆☆☆'.slice(0, 5 - clamped);
+        return `${filled}${empty}`;
+    };
+
+    const formatStatus = (value?: string | null) => {
+        if (!value) return '';
+        return value.replace('_', ' ');
+    };
+
+    const buildHalfStarInput = (
+        value: number | null,
+        onChange: (next: number) => void,
+        label: string,
+    ) => (
+        <div className="star-input" role="radiogroup" aria-label={label}>
+            {Array.from({ length: 5 }, (_, index) => {
+                const fill = Math.max(0, Math.min(1, (value ?? 0) - index));
+                return (
+                    <div key={index} className="star-input__cell">
+                        <span className="star-input__base">★</span>
+                        <span className="star-input__fill" style={{ width: `${fill * 100}%` }}>★</span>
+                        <button
+                            type="button"
+                            className="star-input__hit star-input__hit--left"
+                            onClick={() => onChange(index + 0.5)}
+                            aria-label={`${index + 0.5} stars`}
+                        />
+                        <button
+                            type="button"
+                            className="star-input__hit star-input__hit--right"
+                            onClick={() => onChange(index + 1)}
+                            aria-label={`${index + 1} stars`}
+                        />
+                    </div>
+                );
+            })}
+        </div>
+    );
+
+    const updateCoverPreview = (
+        file: File | null,
+        setPreview: React.Dispatch<React.SetStateAction<string>>,
+    ) => {
+        setPreview(prev => {
+            if (prev) {
+                URL.revokeObjectURL(prev);
+            }
+            if (!file) {
+                return '';
+            }
+            return URL.createObjectURL(file);
+        });
+    };
 
     useEffect(() => {
         if (!Number.isFinite(parsedShelfId)) {
@@ -99,8 +182,9 @@ const ShelfPage: React.FC = () => {
     const updateField = (field: keyof MediaFormState, value: string) => {
         setForm(prev => {
             const next = { ...prev, [field]: value };
-            if (field === 'status' && value !== 'FINISHED') {
-                next.rating = '';
+            if (field === 'userStatus' && value !== 'FINISHED') {
+                next.rating = null;
+                next.comment = '';
             }
             return next;
         });
@@ -109,21 +193,22 @@ const ShelfPage: React.FC = () => {
     const updateEditField = (field: keyof MediaFormState, value: string) => {
         setEditForm(prev => {
             const next = { ...prev, [field]: value };
-            if (field === 'status' && value !== 'FINISHED') {
-                next.rating = '';
+            if (field === 'userStatus' && value !== 'FINISHED') {
+                next.rating = null;
+                next.comment = '';
             }
             return next;
         });
     };
 
-    const parseRating = (value: string): number | undefined => {
-        const trimmed = value.trim();
-        if (!trimmed) return undefined;
-        const numeric = Number(trimmed);
-        if (Number.isNaN(numeric) || numeric < 1 || numeric > 10) {
-            return undefined;
-        }
-        return numeric;
+    const handleFormCoverChange = (file: File | null) => {
+        setFormCoverFile(file);
+        updateCoverPreview(file, setFormCoverPreview);
+    };
+
+    const handleEditCoverChange = (file: File | null) => {
+        setEditCoverFile(file);
+        updateCoverPreview(file, setEditCoverPreview);
     };
 
     const handleSubmit = async () => {
@@ -132,20 +217,31 @@ const ShelfPage: React.FC = () => {
             return;
         }
 
-        const ratingValue = form.status === 'FINISHED' ? parseRating(form.rating) : undefined;
-        if (form.status === 'FINISHED' && form.rating.trim() && ratingValue === undefined) {
-            setError('Rating must be a number between 1 and 10.');
-            return;
+        if (form.userStatus === 'FINISHED' && form.rating !== null) {
+            if (form.rating < 0.5 || form.rating > 5) {
+                setError('Rating must be between 0.5 and 5 stars.');
+                return;
+            }
         }
+
+        const ratingValue = form.userStatus === 'FINISHED' && form.rating !== null
+            ? Math.round(form.rating * 2)
+            : undefined;
+        const genres = form.genres
+            .split(',')
+            .map(tag => tag.trim())
+            .filter(Boolean);
 
         const payload: MediaItemRequest = {
             title: form.title.trim(),
             creator: form.creator.trim(),
             coverUrl: form.coverUrl.trim() || undefined,
             mediaLink: form.mediaLink.trim() || undefined,
-            comment: form.comment.trim() || undefined,
+            comment: form.userStatus === 'FINISHED' ? form.comment.trim() || undefined : undefined,
             type: form.type,
-            status: form.status,
+            seriesStatus: form.seriesStatus,
+            userStatus: form.userStatus,
+            genres: genres.length ? genres : undefined,
             rating: ratingValue,
         };
 
@@ -153,8 +249,14 @@ const ShelfPage: React.FC = () => {
         setError('');
         try {
             const created = await mediaService.addMediaItem(parsedShelfId, payload);
-            setItems(prev => [created, ...prev]);
+            const withCover = formCoverFile
+                ? await mediaService.uploadCoverImage(parsedShelfId, created.id, formCoverFile)
+                : created;
+
+            setItems(prev => [withCover, ...prev]);
             setForm(emptyForm);
+            setFormCoverFile(null);
+            setFormCoverPreview('');
             setShowForm(false);
         } catch (err) {
             setError('Failed to add media item.');
@@ -170,11 +272,15 @@ const ShelfPage: React.FC = () => {
             creator: item.creator || '',
             coverUrl: item.coverUrl || '',
             mediaLink: item.mediaLink || '',
-            rating: item.rating ? String(item.rating) : '',
+            rating: item.rating ? item.rating / 2 : null,
             comment: item.comment || '',
             type: item.type,
-            status: item.status,
+            seriesStatus: item.seriesStatus,
+            userStatus: item.userStatus,
+            genres: item.genres ? item.genres.join(', ') : '',
         });
+        setEditCoverFile(null);
+        setEditCoverPreview(item.coverImageUrl || item.coverUrl || '');
     };
 
     const handleUpdate = async () => {
@@ -184,20 +290,31 @@ const ShelfPage: React.FC = () => {
             return;
         }
 
-        const ratingValue = editForm.status === 'FINISHED' ? parseRating(editForm.rating) : undefined;
-        if (editForm.status === 'FINISHED' && editForm.rating.trim() && ratingValue === undefined) {
-            setError('Rating must be a number between 1 and 10.');
-            return;
+        if (editForm.userStatus === 'FINISHED' && editForm.rating !== null) {
+            if (editForm.rating < 0.5 || editForm.rating > 5) {
+                setError('Rating must be between 0.5 and 5 stars.');
+                return;
+            }
         }
+
+        const ratingValue = editForm.userStatus === 'FINISHED' && editForm.rating !== null
+            ? Math.round(editForm.rating * 2)
+            : undefined;
+        const genres = editForm.genres
+            .split(',')
+            .map(tag => tag.trim())
+            .filter(Boolean);
 
         const payload: MediaItemRequest = {
             title: editForm.title.trim(),
             creator: editForm.creator.trim(),
             coverUrl: editForm.coverUrl.trim() || undefined,
             mediaLink: editForm.mediaLink.trim() || undefined,
-            comment: editForm.comment.trim() || undefined,
+            comment: editForm.userStatus === 'FINISHED' ? editForm.comment.trim() || undefined : undefined,
             type: editForm.type,
-            status: editForm.status,
+            seriesStatus: editForm.seriesStatus,
+            userStatus: editForm.userStatus,
+            genres: genres.length ? genres : undefined,
             rating: ratingValue,
         };
 
@@ -205,8 +322,14 @@ const ShelfPage: React.FC = () => {
         setError('');
         try {
             const updated = await mediaService.updateMediaItem(parsedShelfId, editingItem.id, payload);
-            setItems(prev => prev.map(item => (item.id === updated.id ? updated : item)));
+            const withCover = editCoverFile
+                ? await mediaService.uploadCoverImage(parsedShelfId, editingItem.id, editCoverFile)
+                : updated;
+
+            setItems(prev => prev.map(item => (item.id === withCover.id ? withCover : item)));
             setEditingItem(null);
+            setEditCoverFile(null);
+            setEditCoverPreview('');
         } catch (err) {
             setError('Failed to update media item.');
         } finally {
@@ -216,20 +339,21 @@ const ShelfPage: React.FC = () => {
 
     const closeEdit = () => {
         setEditingItem(null);
+        setEditCoverFile(null);
+        setEditCoverPreview('');
     };
 
     const handleRateShelf = async () => {
         if (!shelf || !canRate) return;
-        const ratingValue = parseRating(shelfRatingInput);
-        if (ratingValue === undefined) {
-            setError('Rating must be a number between 1 and 10.');
+        if (!shelfRatingInput) {
+            setError('Rating must be between 1 and 5 stars.');
             return;
         }
         setError('');
         try {
-            const updated = await shelfService.rateShelf(shelf.id, ratingValue);
+            const updated = await shelfService.rateShelf(shelf.id, shelfRatingInput * 2);
             setShelf(updated);
-            setShelfRatingInput('');
+            setShelfRatingInput(null);
             setRatingNotice('Thanks for rating!');
         } catch (err) {
             setError('Failed to save shelf rating.');
@@ -240,21 +364,43 @@ const ShelfPage: React.FC = () => {
 
     const handleRateMediaItem = async (itemId: number) => {
         if (!canRate) return;
-        const input = mediaRatingInputs[itemId] || '';
-        const ratingValue = parseRating(input);
-        if (ratingValue === undefined) {
-            setError('Rating must be a number between 1 and 10.');
+        const ratingValue = mediaRatingInputs[itemId];
+        if (!ratingValue) {
+            setError('Rating must be between 1 and 5 stars.');
             return;
         }
         setError('');
         try {
-            const updated = await mediaService.rateMediaItem(parsedShelfId, itemId, ratingValue);
+            const updated = await mediaService.rateMediaItem(parsedShelfId, itemId, ratingValue * 2);
             setItems(prev => prev.map(item => (item.id === itemId ? updated : item)));
-            setMediaRatingInputs(prev => ({ ...prev, [itemId]: '' }));
+            setMediaRatingInputs(prev => ({ ...prev, [itemId]: 0 }));
         } catch (err) {
             setError('Failed to save media rating.');
         }
     };
+
+    const [confirmDeleteMediaId, setConfirmDeleteMediaId] = useState<number | null>(null);
+
+    const handleDeleteMedia = (itemId: number) => {
+        if (!isOwner) return;
+        setConfirmDeleteMediaId(itemId);
+    };
+
+    const confirmDeleteMedia = async () => {
+        const itemId = confirmDeleteMediaId;
+        if (!itemId) return;
+        setError('');
+        try {
+            await mediaService.deleteMediaItem(parsedShelfId, itemId);
+            setItems(prev => prev.filter(i => i.id !== itemId));
+        } catch (err) {
+            setError('Failed to delete media item.');
+        } finally {
+            setConfirmDeleteMediaId(null);
+        }
+    };
+
+    const cancelDeleteMedia = () => setConfirmDeleteMediaId(null);
 
     const handleCopyLink = async () => {
         if (!shelf || !shelf.isPublic) return;
@@ -271,7 +417,44 @@ const ShelfPage: React.FC = () => {
     return (
         <div className="shelf-page">
             <nav className="shelf-nav">
-                <button className="btn-back" onClick={() => navigate('/dashboard')}>Back</button>
+                <button className="shelf-nav__brand" onClick={() => navigate('/dashboard')}>
+                    <ShelfdLogoWhite />
+                    <span>Shelfd</span>
+                </button>
+                <div className="shelf-nav__center">
+                    <NavLink
+                        to="/public-shelves"
+                        className={({ isActive }) =>
+                            `shelf-nav__link${isActive ? ' shelf-nav__link--active' : ''}`
+                        }
+                    >
+                        Discover
+                    </NavLink>
+                    <NavLink
+                        to="/dashboard"
+                        className={({ isActive }) =>
+                            `shelf-nav__link${isActive ? ' shelf-nav__link--active' : ''}`
+                        }
+                    >
+                        Dashboard
+                    </NavLink>
+                    <NavLink
+                        to="/monthly-top-shelves"
+                        className={({ isActive }) =>
+                            `shelf-nav__link${isActive ? ' shelf-nav__link--active' : ''}`
+                        }
+                    >
+                        Monthly Top Shelves
+                    </NavLink>
+                    <NavLink
+                        to="/profile"
+                        className={({ isActive }) =>
+                            `shelf-nav__link${isActive ? ' shelf-nav__link--active' : ''}`
+                        }
+                    >
+                        Profile
+                    </NavLink>
+                </div>
                 <div className="shelf-nav__right">
                     <span className="shelf-nav__user">@{user?.username}</span>
                     <button className="btn-logout" onClick={() => { authService.logout(); navigate('/login'); }}>
@@ -294,7 +477,7 @@ const ShelfPage: React.FC = () => {
                             <div className="rating-summary">
                                 {shelf.ratingCount ? (
                                     <span>
-                                        Community rating: {shelf.ratingAverage?.toFixed(1)} ({shelf.ratingCount} ratings)
+                                        {buildStarDisplay(shelf.ratingAverage)} ({shelf.ratingCount})
                                     </span>
                                 ) : (
                                     <span>No community ratings yet.</span>
@@ -313,15 +496,23 @@ const ShelfPage: React.FC = () => {
                         )}
                         {shelf && canRate && (
                             <div className="rating-control">
-                                <input
-                                    className="rating-input"
-                                    type="number"
-                                    min={1}
-                                    max={10}
-                                    value={shelfRatingInput}
-                                    onChange={e => setShelfRatingInput(e.target.value)}
-                                    placeholder="Rate 1-10"
-                                />
+                                <div className="star-picker" role="radiogroup" aria-label="Rate this shelf">
+                                    {Array.from({ length: 5 }, (_, index) => {
+                                        const value = index + 1;
+                                        const isActive = shelfRatingInput !== null && value <= shelfRatingInput;
+                                        return (
+                                            <button
+                                                key={value}
+                                                type="button"
+                                                className={`star-button${isActive ? ' star-button--active' : ''}`}
+                                                onClick={() => setShelfRatingInput(value)}
+                                                aria-checked={isActive}
+                                                role="radio">
+                                                ★
+                                            </button>
+                                        );
+                                    })}
+                                </div>
                                 <button className="btn-secondary" onClick={handleRateShelf}>
                                     Rate shelf
                                 </button>
@@ -363,6 +554,51 @@ const ShelfPage: React.FC = () => {
 
                         <div className="media-form__row">
                             <div className="media-form__field">
+                                <label htmlFor="media-genres">Genres</label>
+                                <input
+                                    id="media-genres"
+                                    value={form.genres}
+                                    onChange={e => updateField('genres', e.target.value)}
+                                    placeholder="e.g. fantasy, mystery"
+                                />
+                            </div>
+                            <div className="media-form__field">
+                                <label htmlFor="media-type">Type</label>
+                                <select id="media-type" value={form.type} onChange={e => updateField('type', e.target.value)}>
+                                    {MEDIA_TYPES.map(type => (
+                                        <option key={type.value} value={type.value}>{type.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="media-form__row">
+                            <div className="media-form__field">
+                                <label htmlFor="media-series-status">Series status</label>
+                                <select id="media-series-status" value={form.seriesStatus} onChange={e => updateField('seriesStatus', e.target.value)}>
+                                    {SERIES_STATUSES.map(status => (
+                                        <option key={status.value} value={status.value}>{status.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="media-form__field">
+                                <label htmlFor="media-user-status">Your status</label>
+                                <select id="media-user-status" value={form.userStatus} onChange={e => updateField('userStatus', e.target.value)}>
+                                    {USER_STATUSES.map(status => (
+                                        <option key={status.value} value={status.value}>{status.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            {form.userStatus === 'FINISHED' && (
+                                <div className="media-form__field">
+                                    <label>Your rating</label>
+                                    {buildHalfStarInput(form.rating, next => setForm(prev => ({ ...prev, rating: next })), 'Your rating')}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="media-form__row">
+                            <div className="media-form__field">
                                 <label htmlFor="media-cover">Cover image URL</label>
                                 <input
                                     id="media-cover"
@@ -372,6 +608,18 @@ const ShelfPage: React.FC = () => {
                                 />
                             </div>
                             <div className="media-form__field">
+                                <label htmlFor="media-upload">Cover upload</label>
+                                <input
+                                    id="media-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={e => handleFormCoverChange(e.target.files ? e.target.files[0] : null)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="media-form__row">
+                            <div className="media-form__field media-form__field--full">
                                 <label htmlFor="media-link">Where to watch / buy</label>
                                 <input
                                     id="media-link"
@@ -382,55 +630,24 @@ const ShelfPage: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="media-form__row">
-                            <div className="media-form__field">
-                                <label htmlFor="media-type">Type</label>
-                                <select id="media-type" value={form.type} onChange={e => updateField('type', e.target.value)}>
-                                    {MEDIA_TYPES.map(type => (
-                                        <option key={type.value} value={type.value}>{type.label}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="media-form__field">
-                                <label htmlFor="media-status">Status</label>
-                                <select id="media-status" value={form.status} onChange={e => updateField('status', e.target.value)}>
-                                    {MEDIA_STATUSES.map(status => (
-                                        <option key={status.value} value={status.value}>{status.label}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            {form.status === 'FINISHED' && (
-                                <div className="media-form__field">
-                                    <label htmlFor="media-rating">Your rating</label>
-                                    <input
-                                        id="media-rating"
-                                        type="number"
-                                        min={1}
-                                        max={10}
-                                        value={form.rating}
-                                        onChange={e => updateField('rating', e.target.value)}
-                                        placeholder="1 - 10"
+                        {form.userStatus === 'FINISHED' && (
+                            <div className="media-form__row">
+                                <div className="media-form__field media-form__field--full">
+                                    <label htmlFor="media-comment">Comment</label>
+                                    <textarea
+                                        id="media-comment"
+                                        rows={4}
+                                        value={form.comment}
+                                        onChange={e => updateField('comment', e.target.value)}
+                                        placeholder="What did you think? Notes, vibes, or highlights."
                                     />
                                 </div>
-                            )}
-                        </div>
-
-                        <div className="media-form__row">
-                            <div className="media-form__field media-form__field--full">
-                                <label htmlFor="media-comment">Comment</label>
-                                <textarea
-                                    id="media-comment"
-                                    rows={4}
-                                    value={form.comment}
-                                    onChange={e => updateField('comment', e.target.value)}
-                                    placeholder="What did you think? Notes, vibes, or highlights."
-                                />
                             </div>
-                        </div>
+                        )}
 
-                        {form.coverUrl.trim() && (
+                        {(formCoverPreview || form.coverUrl.trim()) && (
                             <div className="media-form__preview">
-                                <img src={form.coverUrl} alt="Cover preview" />
+                                <img src={formCoverPreview || form.coverUrl} alt="Cover preview" />
                             </div>
                         )}
 
@@ -456,47 +673,63 @@ const ShelfPage: React.FC = () => {
                     <section className="media-grid">
                         {items.map(item => (
                             <article key={item.id} className="media-card">
-                                {item.coverUrl ? (
-                                    <img src={item.coverUrl} alt="Cover" className="media-card__cover" />
+                                {item.coverImageUrl || item.coverUrl ? (
+                                    <img src={item.coverImageUrl || item.coverUrl} alt="Cover" className="media-card__cover" />
                                 ) : (
                                     <div className="media-card__cover media-card__cover--empty">No cover</div>
                                 )}
                                 <div className="media-card__body">
                                     <div className="media-card__header">
                                         <h3>{item.title}</h3>
-                                        {item.status === 'FINISHED' && item.rating && (
-                                            <span className="media-card__rating">{item.rating}/10</span>
+                                        {item.userStatus === 'FINISHED' && item.rating && (
+                                            <span className="media-card__rating">{buildStarDisplay(item.rating)} ({item.rating / 2}/5)</span>
                                         )}
                                     </div>
                                     <p className="media-card__creator">{item.creator || 'Unknown creator'}</p>
                                     <div className="media-card__meta">
-                                        <span>{item.type.replace('_', ' ')}</span>
+                                        <span>{(item.type || '').replace('_', ' ')}</span>
                                         <span>-</span>
-                                        <span>{item.status.replace('_', ' ')}</span>
+                                        <span>Series: {formatStatus(item.seriesStatus)}</span>
+                                        <span>-</span>
+                                        <span>You: {formatStatus(item.userStatus)}</span>
                                     </div>
+                                    {item.genres && item.genres.length > 0 && (
+                                        <div className="media-card__genres">
+                                            {item.genres.map(genre => (
+                                                <span key={genre} className="media-card__genre">{genre}</span>
+                                            ))}
+                                        </div>
+                                    )}
                                     <div className="media-card__ratings">
                                         {item.ratingCount ? (
-                                            <span>
-                                                Community rating: {item.ratingAverage?.toFixed(1)} ({item.ratingCount})
-                                            </span>
+                                            <span>{buildStarDisplay(item.ratingAverage)} ({item.ratingCount})</span>
                                         ) : (
                                             <span>No community ratings yet.</span>
                                         )}
                                     </div>
                                     {canRate && (
                                         <div className="media-card__rate">
-                                            <input
-                                                className="rating-input rating-input--compact"
-                                                type="number"
-                                                min={1}
-                                                max={10}
-                                                value={mediaRatingInputs[item.id] || ''}
-                                                onChange={e => setMediaRatingInputs(prev => ({
-                                                    ...prev,
-                                                    [item.id]: e.target.value,
-                                                }))}
-                                                placeholder="1-10"
-                                            />
+                                            <div className="star-picker star-picker--compact" role="radiogroup" aria-label="Rate this media">
+                                                {Array.from({ length: 5 }, (_, index) => {
+                                                    const value = index + 1;
+                                                    const current = mediaRatingInputs[item.id] || 0;
+                                                    const isActive = value <= current;
+                                                    return (
+                                                        <button
+                                                            key={value}
+                                                            type="button"
+                                                            className={`star-button${isActive ? ' star-button--active' : ''}`}
+                                                            onClick={() => setMediaRatingInputs(prev => ({
+                                                                ...prev,
+                                                                [item.id]: value,
+                                                            }))}
+                                                            aria-checked={isActive}
+                                                            role="radio">
+                                                            ★
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
                                             <button
                                                 className="btn-secondary"
                                                 onClick={() => handleRateMediaItem(item.id)}>
@@ -504,16 +737,23 @@ const ShelfPage: React.FC = () => {
                                             </button>
                                         </div>
                                     )}
-                                    {item.comment && <p className="media-card__comment">{item.comment}</p>}
+                                    {item.userStatus === 'FINISHED' && item.comment && (
+                                        <p className="media-card__comment">{item.comment}</p>
+                                    )}
                                     {item.mediaLink && (
                                         <a className="media-card__link" href={item.mediaLink} target="_blank" rel="noreferrer">
                                             Open link
                                         </a>
                                     )}
                                     {isOwner && (
-                                        <button className="media-card__edit" onClick={() => openEdit(item)}>
-                                            Edit
-                                        </button>
+                                        <>
+                                            <button className="media-card__edit" onClick={() => openEdit(item)}>
+                                                Edit
+                                            </button>
+                                            <button className="media-card__delete media-card__delete--dark" onClick={() => handleDeleteMedia(item.id)}>
+                                                Delete
+                                            </button>
+                                        </>
                                     )}
                                 </div>
                             </article>
@@ -521,6 +761,17 @@ const ShelfPage: React.FC = () => {
                     </section>
                 )}
             </main>
+
+                {confirmDeleteMediaId !== null && (
+                    <ConfirmDialog
+                        title="Delete media item"
+                        message="Delete this media item? This cannot be undone."
+                        confirmLabel="Delete"
+                        cancelLabel="Cancel"
+                        onConfirm={confirmDeleteMedia}
+                        onCancel={cancelDeleteMedia}
+                    />
+                )}
 
             {editingItem && (
                 <div className="modal-overlay" role="dialog" aria-modal="true">
@@ -551,6 +802,51 @@ const ShelfPage: React.FC = () => {
 
                             <div className="media-form__row">
                                 <div className="media-form__field">
+                                    <label htmlFor="edit-genres">Genres</label>
+                                    <input
+                                        id="edit-genres"
+                                        value={editForm.genres}
+                                        onChange={e => updateEditField('genres', e.target.value)}
+                                        placeholder="e.g. fantasy, mystery"
+                                    />
+                                </div>
+                                <div className="media-form__field">
+                                    <label htmlFor="edit-type">Type</label>
+                                    <select id="edit-type" value={editForm.type} onChange={e => updateEditField('type', e.target.value)}>
+                                        {MEDIA_TYPES.map(type => (
+                                            <option key={type.value} value={type.value}>{type.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="media-form__row">
+                                <div className="media-form__field">
+                                    <label htmlFor="edit-series-status">Series status</label>
+                                    <select id="edit-series-status" value={editForm.seriesStatus} onChange={e => updateEditField('seriesStatus', e.target.value)}>
+                                        {SERIES_STATUSES.map(status => (
+                                            <option key={status.value} value={status.value}>{status.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="media-form__field">
+                                    <label htmlFor="edit-user-status">Your status</label>
+                                    <select id="edit-user-status" value={editForm.userStatus} onChange={e => updateEditField('userStatus', e.target.value)}>
+                                        {USER_STATUSES.map(status => (
+                                            <option key={status.value} value={status.value}>{status.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                {editForm.userStatus === 'FINISHED' && (
+                                    <div className="media-form__field">
+                                        <label>Your rating</label>
+                                        {buildHalfStarInput(editForm.rating, next => setEditForm(prev => ({ ...prev, rating: next })), 'Your rating')}
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="media-form__row">
+                                <div className="media-form__field">
                                     <label htmlFor="edit-cover">Cover image URL</label>
                                     <input
                                         id="edit-cover"
@@ -559,6 +855,18 @@ const ShelfPage: React.FC = () => {
                                     />
                                 </div>
                                 <div className="media-form__field">
+                                    <label htmlFor="edit-upload">Cover upload</label>
+                                    <input
+                                        id="edit-upload"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={e => handleEditCoverChange(e.target.files ? e.target.files[0] : null)}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="media-form__row">
+                                <div className="media-form__field media-form__field--full">
                                     <label htmlFor="edit-link">Where to watch / buy</label>
                                     <input
                                         id="edit-link"
@@ -568,49 +876,25 @@ const ShelfPage: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="media-form__row">
-                                <div className="media-form__field">
-                                    <label htmlFor="edit-type">Type</label>
-                                    <select id="edit-type" value={editForm.type} onChange={e => updateEditField('type', e.target.value)}>
-                                        {MEDIA_TYPES.map(type => (
-                                            <option key={type.value} value={type.value}>{type.label}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="media-form__field">
-                                    <label htmlFor="edit-status">Status</label>
-                                    <select id="edit-status" value={editForm.status} onChange={e => updateEditField('status', e.target.value)}>
-                                        {MEDIA_STATUSES.map(status => (
-                                            <option key={status.value} value={status.value}>{status.label}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                {editForm.status === 'FINISHED' && (
-                                    <div className="media-form__field">
-                                        <label htmlFor="edit-rating">Your rating</label>
-                                        <input
-                                            id="edit-rating"
-                                            type="number"
-                                            min={1}
-                                            max={10}
-                                            value={editForm.rating}
-                                            onChange={e => updateEditField('rating', e.target.value)}
+                            {editForm.userStatus === 'FINISHED' && (
+                                <div className="media-form__row">
+                                    <div className="media-form__field media-form__field--full">
+                                        <label htmlFor="edit-comment">Comment</label>
+                                        <textarea
+                                            id="edit-comment"
+                                            rows={4}
+                                            value={editForm.comment}
+                                            onChange={e => updateEditField('comment', e.target.value)}
                                         />
                                     </div>
-                                )}
-                            </div>
-
-                            <div className="media-form__row">
-                                <div className="media-form__field media-form__field--full">
-                                    <label htmlFor="edit-comment">Comment</label>
-                                    <textarea
-                                        id="edit-comment"
-                                        rows={4}
-                                        value={editForm.comment}
-                                        onChange={e => updateEditField('comment', e.target.value)}
-                                    />
                                 </div>
-                            </div>
+                            )}
+
+                            {editCoverPreview && (
+                                <div className="media-form__preview">
+                                    <img src={editCoverPreview} alt="Cover preview" />
+                                </div>
+                            )}
                         </div>
                         <div className="modal-actions">
                             <button className="btn-primary" onClick={handleUpdate} disabled={updating}>
@@ -626,3 +910,4 @@ const ShelfPage: React.FC = () => {
 };
 
 export default ShelfPage;
+

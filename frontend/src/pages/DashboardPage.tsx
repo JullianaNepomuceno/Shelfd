@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
 import shelfService, { ShelfResponse } from '../services/shelfService';
 import './dashboard.css';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 const ShelfdLogoWhite: React.FC = () => (
     <svg width="28" height="28" viewBox="0 0 22 22" fill="none" aria-hidden="true">
@@ -102,14 +103,26 @@ const DashboardPage: React.FC = () => {
         }
     };
 
-    const handleDeleteShelf = async (id: number) => {
+    const [confirmDeleteShelfId, setConfirmDeleteShelfId] = useState<number | null>(null);
+
+    const handleDeleteShelf = (id: number) => {
+        setConfirmDeleteShelfId(id);
+    };
+
+    const confirmDeleteShelf = async () => {
+        const id = confirmDeleteShelfId;
+        if (!id) return;
         try {
             await shelfService.deleteShelf(id);
             setShelves(prev => prev.filter(s => s.id !== id));
         } catch (err) {
             setError('Failed to delete shelf.');
+        } finally {
+            setConfirmDeleteShelfId(null);
         }
     };
+
+    const cancelDeleteShelf = () => setConfirmDeleteShelfId(null);
 
     const handleLogout = () => {
         authService.logout();
@@ -121,9 +134,45 @@ const DashboardPage: React.FC = () => {
 
             {/* ── Navbar ── */}
             <nav className="dashboard-nav">
-                <div className="dashboard-nav__brand">
-                    <ShelfdLogoWhite />
-                    <span>Shelfd</span>
+                <div className="dashboard-nav__left">
+                    <div className="dashboard-nav__brand">
+                        <ShelfdLogoWhite />
+                        <span>Shelfd</span>
+                    </div>
+                </div>
+                <div className="dashboard-nav__center">
+                    <NavLink
+                        to="/public-shelves"
+                        className={({ isActive }) =>
+                            `dashboard-nav__link${isActive ? ' dashboard-nav__link--active' : ''}`
+                        }
+                    >
+                        Discover
+                    </NavLink>
+                    <NavLink
+                        to="/dashboard"
+                        className={({ isActive }) =>
+                            `dashboard-nav__link${isActive ? ' dashboard-nav__link--active' : ''}`
+                        }
+                    >
+                        Dashboard
+                    </NavLink>
+                    <NavLink
+                        to="/monthly-top-shelves"
+                        className={({ isActive }) =>
+                            `dashboard-nav__link${isActive ? ' dashboard-nav__link--active' : ''}`
+                        }
+                    >
+                        Monthly Top Shelves
+                    </NavLink>
+                    <NavLink
+                        to="/profile"
+                        className={({ isActive }) =>
+                            `dashboard-nav__link${isActive ? ' dashboard-nav__link--active' : ''}`
+                        }
+                    >
+                        Profile
+                    </NavLink>
                 </div>
                 <div className="dashboard-nav__right">
                     <span className="dashboard-nav__user">@{user?.username}</span>
@@ -136,9 +185,6 @@ const DashboardPage: React.FC = () => {
                 <div className="dashboard-header">
                     <h1 className="dashboard-title">My Shelves</h1>
                     <div className="dashboard-header__actions">
-                        <button className="btn-secondary" onClick={() => navigate('/public-shelves')}>
-                            Public Shelves
-                        </button>
                         <button className="btn-new-shelf" onClick={() => setShowForm(v => !v)}>
                             + New Shelf
                         </button>
@@ -208,9 +254,17 @@ const DashboardPage: React.FC = () => {
                                                 Edit
                                             </button>
                                         )}
-                                        <button className="shelf-card__delete"
+                                        <button className="shelf-card__delete shelf-card__delete--trash"
                                             onClick={e => { e.stopPropagation(); handleDeleteShelf(shelf.id); }}
-                                            aria-label="Delete shelf">x</button>
+                                            aria-label="Delete shelf">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                                                <path d="M3 6h18" stroke="#e53e3e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                <path d="M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6" stroke="#e53e3e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                <path d="M10 11v6" stroke="#e53e3e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                <path d="M14 11v6" stroke="#e53e3e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" stroke="#e53e3e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                            </svg>
+                                        </button>
                                     </div>
                                 </div>
                                 {isEditing ? (
@@ -260,6 +314,16 @@ const DashboardPage: React.FC = () => {
                     </div>
                 )}
             </main>
+            {confirmDeleteShelfId !== null && (
+                <ConfirmDialog
+                    title="Delete shelf"
+                    message="Are you sure you want to delete this shelf and all its media? This action cannot be undone."
+                    confirmLabel="Delete shelf"
+                    cancelLabel="Cancel"
+                    onConfirm={confirmDeleteShelf}
+                    onCancel={cancelDeleteShelf}
+                />
+            )}
         </div>
     );
 };
