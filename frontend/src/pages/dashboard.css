@@ -19,6 +19,21 @@
     flex-shrink: 0;
 }
 
+.dashboard-nav__left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    min-width: 180px;
+}
+
+.dashboard-nav__center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    flex: 1;
+}
+
 .dashboard-nav__brand {
     display: flex;
     align-items: center;
@@ -30,11 +45,55 @@
     letter-spacing: -0.5px;
 }
 
+.dashboard-nav__link {
+    position: relative;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.75);
+    text-decoration: none;
+    padding: 6px 10px 8px;
+    border-radius: 8px;
+    transition: color 0.2s, background 0.2s;
+}
+
+.dashboard-nav__link:hover,
+.dashboard-nav__link:focus,
+.dashboard-nav__link:visited,
+.dashboard-nav__link:active {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+    text-decoration: none;
+}
+
+.dashboard-nav__link::after {
+    content: '';
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 2px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.7);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.25s ease;
+}
+
+.dashboard-nav__link--active {
+    color: #fff;
+}
+
+.dashboard-nav__link--active::after,
+.dashboard-nav__link:hover::after {
+    transform: scaleX(1);
+}
+
 .dashboard-nav__right {
     display: flex;
     align-items: center;
     gap: 16px;
+    min-width: 180px;
+    justify-content: flex-end;
 }
+
 
 .dashboard-nav__user {
     font-size: 13px;
@@ -103,21 +162,6 @@
     background: #333;
 }
 
-.btn-secondary {
-    height: 38px;
-    padding: 0 18px;
-    background: none;
-    color: var(--ink, #1A1610);
-    border: 1px solid var(--border, #E8E3DC);
-    border-radius: 8px;
-    font-size: 13px;
-    cursor: pointer;
-    transition: border-color 0.2s;
-}
-
-.btn-secondary:hover {
-    border-color: rgba(26, 22, 16, 0.35);
-}
 
 /* ── New shelf form ───────────────────────────────────────────────────────── */
 
@@ -290,13 +334,17 @@
     color: #ccc;
     font-size: 13px;
     cursor: pointer;
-    padding: 2px 4px;
-    border-radius: 4px;
-    transition: color 0.15s;
+    padding: 6px;
+    border-radius: 6px;
+    transition: color 0.15s, background 0.15s;
     line-height: 1;
 }
 
-.shelf-card__delete:hover { color: #e53e3e; }
+.shelf-card__delete:hover { color: #e53e3e; background: rgba(229,62,62,0.06); }
+
+.shelf-card__delete--trash svg { display: block; }
+
+.shelf-card__delete--trash { color: #e53e3e; }
 
 .shelf-card__edit-body {
     display: flex;

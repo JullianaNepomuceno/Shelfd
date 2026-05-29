@@ -1,11 +1,15 @@
 package com.shelfd.dto;
 
-import com.shelfd.entity.MediaStatus;
 import com.shelfd.entity.MediaType;
+import com.shelfd.entity.SeriesStatus;
+import com.shelfd.entity.UserStatus;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
+import java.util.List;
 
 public class MediaItemRequest {
 
@@ -24,8 +28,14 @@ public class MediaItemRequest {
     @NotNull(message = "Media type is required")
     private MediaType type;
 
-    @NotNull(message = "Status is required")
-    private MediaStatus status;
+    @NotNull(message = "Series status is required")
+    private SeriesStatus seriesStatus;
+
+    @NotNull(message = "User status is required")
+    private UserStatus userStatus;
+
+    @Size(max = 12, message = "Genres must be 12 tags or fewer")
+    private List<String> genres;
 
     @Min(value = 1, message = "Rating must be between 1 and 10")
     @Max(value = 10, message = "Rating must be between 1 and 10")
@@ -37,6 +47,8 @@ public class MediaItemRequest {
     public String getCoverUrl() { return coverUrl; }
     public String getComment() { return comment; }
     public MediaType getType() { return type; }
-    public MediaStatus getStatus() { return status; }
+    public SeriesStatus getSeriesStatus() { return seriesStatus; }
+    public UserStatus getUserStatus() { return userStatus; }
+    public List<String> getGenres() { return genres; }
     public Integer getRating() { return rating; }
 }
