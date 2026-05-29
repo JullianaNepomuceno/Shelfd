@@ -2,6 +2,7 @@
 
 ---
 
+**\<05/28/2026\>**: Improved dashboard and media UI, seperate user and media status, and added profile page.
 **\<05/28/2026\>**: Added community ratings for shelves and media items with average and count stats shown on the shelf page.   
 **\<05/27/2026\>**: Added the add media feature with a shelf media page, form inputs for title, author/publisher, cover URL, watch link, rating, comments, and public shelf ratings, plus backend support for the new fields.      
 **\<05/24/2026\>**: Finished the Login and Sign up pages and created the Backend and Frontend of the dashboard.     
