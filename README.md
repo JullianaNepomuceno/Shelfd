@@ -14,6 +14,17 @@
 - **Build Tools:** Maven
 - **Other:** Lombok
 
+___
+
+## 📚 Documentation
+
+| Document | Description |
+|-----------|-------------|
+| [API Documentation](docs/API_DOCUMENTATION.md) | REST endpoints and request/response formats |
+| [Database Schema](docs/DATABASE_SCHEMA.md) | Database design and relationships |
+| [System Architecture](docs/SYSTEM_ARCHITECTURE.md) | High-level application architecture |
+| [Use Cases](docs/USE_CASES.md) | Functional use cases and workflows |
+| [Changelog](docs/CHANGELOG.md) | Project update history |
 
 ---
 

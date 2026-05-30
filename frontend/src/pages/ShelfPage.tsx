@@ -5,16 +5,7 @@ import mediaService, { MediaItemRequest, MediaItemResponse, SeriesStatus, UserSt
 import shelfService, { ShelfResponse } from '../services/shelfService';
 import './shelf.css';
 import ConfirmDialog from '../components/ConfirmDialog';
-
-const ShelfdLogoWhite: React.FC = () => (
-    <svg width="24" height="24" viewBox="0 0 22 22" fill="none" aria-hidden="true">
-        <rect x="1"  y="3"  width="4" height="16" rx="1" fill="#C4532A" />
-        <rect x="7"  y="5"  width="3" height="14" rx="1" fill="rgba(255,255,255,0.5)" />
-        <rect x="12" y="2"  width="5" height="17" rx="1" fill="rgba(255,255,255,0.3)" />
-        <rect x="19" y="6"  width="2" height="13" rx="1" fill="rgba(255,255,255,0.6)" />
-        <rect x="0"  y="18" width="22" height="2"  rx="1" fill="rgba(255,255,255,0.2)" />
-    </svg>
-);
+import Navbar from "../components/Navbar";
 
 const MEDIA_TYPES: { label: string; value: MediaType }[] = [
     { label: 'Movie', value: 'MOVIE' },
@@ -417,50 +408,7 @@ const ShelfPage: React.FC = () => {
     return (
         <div className="shelf-page">
             <nav className="shelf-nav">
-                <button className="shelf-nav__brand" onClick={() => navigate('/dashboard')}>
-                    <ShelfdLogoWhite />
-                    <span>Shelfd</span>
-                </button>
-                <div className="shelf-nav__center">
-                    <NavLink
-                        to="/public-shelves"
-                        className={({ isActive }) =>
-                            `shelf-nav__link${isActive ? ' shelf-nav__link--active' : ''}`
-                        }
-                    >
-                        Discover
-                    </NavLink>
-                    <NavLink
-                        to="/dashboard"
-                        className={({ isActive }) =>
-                            `shelf-nav__link${isActive ? ' shelf-nav__link--active' : ''}`
-                        }
-                    >
-                        Dashboard
-                    </NavLink>
-                    <NavLink
-                        to="/monthly-top-shelves"
-                        className={({ isActive }) =>
-                            `shelf-nav__link${isActive ? ' shelf-nav__link--active' : ''}`
-                        }
-                    >
-                        Monthly Top Shelves
-                    </NavLink>
-                    <NavLink
-                        to="/profile"
-                        className={({ isActive }) =>
-                            `shelf-nav__link${isActive ? ' shelf-nav__link--active' : ''}`
-                        }
-                    >
-                        Profile
-                    </NavLink>
-                </div>
-                <div className="shelf-nav__right">
-                    <span className="shelf-nav__user">@{user?.username}</span>
-                    <button className="btn-logout" onClick={() => { authService.logout(); navigate('/login'); }}>
-                        Log out
-                    </button>
-                </div>
+                <Navbar />
             </nav>
 
             <main className="shelf-main">
