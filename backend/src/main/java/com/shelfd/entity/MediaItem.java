@@ -50,7 +50,6 @@ public class MediaItem {
     @Column(name = "user_status", nullable = true)
     private UserStatus userStatus;
 
-    // ✅ Added missing field for MediaStatus
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = true)
     private MediaStatus status;

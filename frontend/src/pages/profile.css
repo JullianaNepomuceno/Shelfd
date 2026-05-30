@@ -7,114 +7,6 @@
     flex-direction: column;
 }
 
-/* ── Navbar ───────────────────────────────────────────────────────────────── */
-
-.profile-nav {
-    height: 56px;
-    background: var(--ink, #1A1610);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 32px;
-    flex-shrink: 0;
-}
-
-.profile-nav__left {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    min-width: 180px;
-}
-
-.profile-nav__center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 22px;
-    flex: 1;
-}
-
-.profile-nav__brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-family: var(--font-display, serif);
-    font-size: 18px;
-    font-weight: 700;
-    color: #fff;
-    letter-spacing: -0.5px;
-}
-
-.profile-nav__link {
-    position: relative;
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.75);
-    text-decoration: none;
-    padding: 6px 10px 8px;
-    border-radius: 8px;
-    transition: color 0.2s, background 0.2s;
-}
-
-.profile-nav__link:hover,
-.profile-nav__link:focus,
-.profile-nav__link:visited,
-.profile-nav__link:active {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.08);
-    text-decoration: none;
-}
-
-.profile-nav__link::after {
-    content: '';
-    position: absolute;
-    left: 10px;
-    right: 10px;
-    bottom: 2px;
-    height: 2px;
-    background: rgba(255, 255, 255, 0.7);
-    transform: scaleX(0);
-    transform-origin: center;
-    transition: transform 0.25s ease;
-}
-
-.profile-nav__link--active {
-    color: #fff;
-}
-
-.profile-nav__link--active::after,
-.profile-nav__link:hover::after {
-    transform: scaleX(1);
-}
-
-.profile-nav__right {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    min-width: 180px;
-    justify-content: flex-end;
-}
-
-
-.profile-nav__user {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.55);
-}
-
-.btn-logout {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.7);
-    background: none;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 6px;
-    padding: 5px 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-logout:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
-}
 
 /* ── Main ─────────────────────────────────────────────────────────────────── */
 
@@ -156,7 +48,7 @@
     align-items: start;
 }
 
-/* ── Cards — same white surface + border as auth form inputs ─────────────── */
+/* ── Cards ────────────────────────────────────────────────────────────────── */
 
 .profile-card {
     background: #fff;
@@ -199,7 +91,7 @@
     flex-shrink: 0;
 }
 
-/* ── Form fields — same as auth.css ──────────────────────────────────────── */
+/* ── Form fields ──────────────────────────────────────────────────────────── */
 
 .form-row {
     display: flex;
@@ -246,7 +138,6 @@
     color: #C2BCB3;
 }
 
-/* File input */
 .file-input {
     display: flex;
     align-items: center;
@@ -265,7 +156,7 @@
     outline: none;
 }
 
-/* ── Save button — same as auth btn-primary ──────────────────────────────── */
+/* ── Save button ──────────────────────────────────────────────────────────── */
 
 .form-actions {
     margin-top: 8px;
@@ -289,13 +180,9 @@
     transition: background 0.2s ease, transform 0.1s ease;
 }
 
-.btn-save:hover {
-    background: #2e2820;
-}
-
-.btn-save:active {
-    transform: scale(0.99);
-}
+.btn-save:hover { background: #2e2820; }
+.btn-save:active { transform: scale(0.99); }
+.btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* ── Analytics card ──────────────────────────────────────────────────────── */
 
@@ -357,15 +244,7 @@
 /* ── Responsive ───────────────────────────────────────────────────────────── */
 
 @media (max-width: 820px) {
-    .profile-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .profile-nav__center {
-        display: none;
-    }
-
-    .profile-main {
-        padding: 28px 16px 60px;
-    }
+    .profile-grid { grid-template-columns: 1fr; }
+    .profile-nav__center { display: none; }
+    .profile-main { padding: 28px 16px 60px; }
 }
